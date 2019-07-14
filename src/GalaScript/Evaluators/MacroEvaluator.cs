@@ -9,7 +9,7 @@ namespace GalaScript.Evaluators
         private readonly string _name;
         private readonly IEnumerable<string> _parameters;
 
-        public MacroEvaluator(IEngine engine, string name, IEnumerable<string> parameters, string str) : base(engine, str, false)
+        public MacroEvaluator(IEngine engine, string name, IEnumerable<string> parameters, string str) : base(engine, str)
         {
             _name = name;
             _parameters = parameters;

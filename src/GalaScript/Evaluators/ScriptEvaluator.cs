@@ -17,7 +17,7 @@ namespace GalaScript.Evaluators
         private IDropOutStack<object> _ebx = new DropOutStack<object>(10);
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
-        public ScriptEvaluator(IEngine engine, string str, bool isRootScriptEvaluator = true)
+        public ScriptEvaluator(IEngine engine, string str)
         {
             var evaluators = engine.GetParser().Prepare(str);
 
@@ -25,10 +25,7 @@ namespace GalaScript.Evaluators
             {
                 if (exp == null) continue;
 
-                if (!isRootScriptEvaluator)
-                {
-                    exp.SetCaller(this);
-                }
+                exp.SetCaller(this);
 
                 switch (exp)
                 {

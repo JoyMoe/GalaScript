@@ -74,11 +74,6 @@ namespace GalaScript
 
         public object Call(IScriptEvaluator caller, string name , params object[] arguments)
         {
-            if (caller == null)
-            {
-                caller = _script;
-            }
-
             var parameters = new object[arguments.Length + 1];
             Array.Copy(arguments, 0, parameters, 1, arguments.Length);
             parameters[0] = caller;
@@ -97,21 +92,11 @@ namespace GalaScript
 
         public void SetAlias(IScriptEvaluator caller, string name, object value)
         {
-            if (caller == null)
-            {
-                caller = _script;
-            }
-
             caller.SetAlias(name, value);
         }
 
         public object GetAlias(IScriptEvaluator caller, string name)
         {
-            if (caller == null)
-            {
-                caller = _script;
-            }
-
             return caller.GetAlias(name);
         }
 
