@@ -123,7 +123,7 @@ namespace GalaScript
                 from eol in Parse.LineEnd
                 from str in Parse.CharExcept('!').AtLeastOnce().Text()
                 from ending in Parse.Char('!')
-                select new MacroEvaluator(_engine, name, parameters.GetOrDefault(), str);
+                select new MacroEvaluator(_engine, name, parameters.GetOrDefault()?.ToArray(), str);
 
             Evaluator = Macro.Or(Label).Or(Text).Or(Alias).Or(Function);
         }

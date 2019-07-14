@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
@@ -8,9 +6,9 @@ namespace GalaScript.Evaluators
     public class MacroEvaluator : ScriptEvaluator, INamedEvaluator
     {
         private readonly string _name;
-        private readonly IEnumerable<string> _parameters;
+        private readonly string[] _parameters;
 
-        public MacroEvaluator(IEngine engine, string name, IEnumerable<string> parameters, string str)
+        public MacroEvaluator(IEngine engine, string name, string[] parameters, string str)
         {
             _name = name;
             _parameters = parameters;
@@ -44,11 +42,11 @@ namespace GalaScript.Evaluators
             return _name;
         }
 
-        public void SetArguments(IEnumerable<object> arguments)
+        public void SetArguments(object[] arguments)
         {
-            for (var i = 0; i < _parameters.Count(); i++)
+            for (var i = 0; i < _parameters.Length; i++)
             {
-                SetAlias(_parameters.ElementAt(i), arguments.ElementAt(i));
+                SetAlias(_parameters[i], arguments[i]);
             }
         }
     }

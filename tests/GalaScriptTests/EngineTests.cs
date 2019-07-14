@@ -121,6 +121,17 @@ namespace GalaScriptTests
 ");
 
             Assert.AreEqual(6.0, _engine.Evaluate());
+
+            _engine.Prepare(@"
+!bar
+    [add 2 2]
+    [add ret 2]
+!
+
+[bar]
+");
+
+            Assert.AreEqual(6.0, _engine.Evaluate());
         }
 
         [Test, Order(7)]

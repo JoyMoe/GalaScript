@@ -40,7 +40,11 @@ namespace GalaScript.Evaluators
                         engine.Register(macro.GetName(), objects =>
                         {
                             macro.SetCaller(objects.FirstOrDefault() as IScriptEvaluator);
-                            macro.SetArguments(objects.Skip(1));
+
+                            if (objects.Length > 1)
+                            {
+                                macro.SetArguments(objects.Skip(1).ToArray());
+                            }
                             return macro.Evaluate();
                         });
 
