@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\misc\test.gs">
+    <None Include="..\..\misc\test.gs">
       <Link>test.gs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>
