@@ -14,4 +14,11 @@
     <ProjectReference Include="..\..\src\GalaScript\GalaScript.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\..\misc\test.gs">
+      <Link>test.gs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
