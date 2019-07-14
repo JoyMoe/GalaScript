@@ -14,6 +14,8 @@ namespace GalaScript.Interfaces
 
         void Register(string name, Func<object[], object> func);
 
+        void Register(string name, Delegate func);
+
         object Call(IScriptEvaluator caller, string name, params object[] arguments);
 
         void SetAlias(IScriptEvaluator caller, string name, object value);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Linq.Expressions;
 using GalaScript.Internal;
 using GalaScript.Interfaces;
 
@@ -70,6 +71,65 @@ namespace GalaScript
         public void Register(string name, Func<object[], object> func)
         {
             _functions[name] = func;
+        }
+
+        public void Register(string name, Delegate func)
+        {
+            var funcParameters = func.Method.GetParameters();
+            var paraExpr = Expression.Parameter(typeof(object[]), "obj");
+            var callExprs = new Expression[funcParameters.Length];
+
+            var isCallerRequired = 1;
+            var converter = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) });
+
+            for (var i = 0; i < funcParameters.Length; i++)
+            {
+                var info = funcParameters[i];
+                //if (info.ParameterType == typeof(IEngine))
+                //{
+                //    callExprs[i] = Expression.Constant(this);
+                //}
+                if (info.ParameterType == typeof(IScriptEvaluator))
+                {
+                    callExprs[i] = Expression.ArrayIndex(paraExpr, Expression.Constant(0));
+                    isCallerRequired = 0;
+                }
+                if (info.ParameterType.IsValueType || info.ParameterType == typeof(string))
+                {
+                    var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(i + isCallerRequired)), Expression.Constant(info.ParameterType));
+                    callExprs[i] = Expression.Convert(convert, info.ParameterType);
+                }
+                else
+                {
+                    throw new ArgumentException("argument type must be value type or string", info.Name);
+                }
+            }
+
+            var body = Expression.Call(Expression.Constant(func.Target), func.Method, callExprs);
+
+            var isAction = func.Method.ReturnType == typeof(void);
+
+            Func<object[], object> fun;
+            if(isAction)
+            {
+                var _actionCaller = Expression.Lambda<Action<object[]>>(body, paraExpr).Compile();
+                fun = (obj) =>
+                {
+                    _actionCaller(obj);
+                    return null;
+                };
+            }
+            else
+            {
+                var boxed = Expression.Convert(body, typeof(object));
+                var _funcCaller = Expression.Lambda<Func<object[], object>>(boxed, paraExpr).Compile();
+                fun = (obj) =>
+                {
+                    return _funcCaller(obj);
+                };
+            }
+
+            _functions[name] = fun;
         }
 
         public object Call(IScriptEvaluator caller, string name , params object[] arguments)
