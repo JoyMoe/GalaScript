@@ -10,12 +10,17 @@ namespace GalaScript.Evaluators
     public class ScriptEvaluator : IScriptEvaluator
     {
         private LinkedListNode<IEvaluator> _current;
-        private readonly LinkedList<IEvaluator> _script = new LinkedList<IEvaluator>();
-        private readonly Dictionary<string, LinkedListNode<IEvaluator>> _labels = new Dictionary<string, LinkedListNode<IEvaluator>>();
+        protected readonly LinkedList<IEvaluator> _script = new LinkedList<IEvaluator>();
+        protected readonly Dictionary<string, LinkedListNode<IEvaluator>> _labels = new Dictionary<string, LinkedListNode<IEvaluator>>();
 
         private IDropOutStack<object> _eax = new DropOutStack<object>(10);
         private IDropOutStack<object> _ebx = new DropOutStack<object>(10);
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
+
+        protected ScriptEvaluator()
+        {
+
+        }
 
         public ScriptEvaluator(IEngine engine, string str)
         {
@@ -44,14 +49,12 @@ namespace GalaScript.Evaluators
                         // TODO: add option to config ReplaceEnvironment in sub-script
                         sub.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
                         break;
+                    case LabelEvaluator label:
+                        _labels[label.GetName()] = _script.Last;
+                        break;
                 }
 
                 _script.AddLast(exp);
-
-                if (exp is LabelEvaluator label)
-                {
-                    _labels[label.GetName()] = _script.Last;
-                }
             }
 
             Reset();
