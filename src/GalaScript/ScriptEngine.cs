@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Linq.Expressions;
 using GalaScript.Internal;
@@ -13,11 +12,7 @@ namespace GalaScript
     {
         private IParser _parser;
 
-        private readonly IEnumerable<string> _keywords = new string[0];
-
         private readonly Dictionary<string, Func<object[], object>> _functions = new Dictionary<string, Func<object[], object>>();
-
-        private readonly Dictionary<string, Func<object[], object>> _operations = new Dictionary<string, Func<object[], object>>();
 
         private IScriptEvaluator _script;
 
@@ -27,23 +22,15 @@ namespace GalaScript
 
         private void PrepareOperations()
         {
-            foreach (var method in typeof(EngineOperations).GetTypeInfo()
-                .GetMethods(BindingFlags.Static | BindingFlags.Public))
-            {
-                _operations.Add(method.Name.ToLower(), objects =>
-                {
-                    try
-                    {
-                        return method.Invoke(method, objects);
-                    }
-                    catch (TargetInvocationException ex)
-                    {
-                        if (ex.InnerException == null) throw;
+            Register("push", (Action<IScriptEvaluator, string>)EngineOperations.Push);
 
-                        throw ex.InnerException;
-                    }
-                });
-            }
+            Register("peek", (Func<IScriptEvaluator, string, object>)EngineOperations.Peek);
+
+            Register("pop", (Func<IScriptEvaluator, string, object>)EngineOperations.Pop);
+
+            Register("goto", (Action<IScriptEvaluator, string>)EngineOperations.Goto);
+
+            Register("goif", (Action<IScriptEvaluator, string>)EngineOperations.Goif);
         }
 
         public ScriptEngine()
@@ -61,16 +48,6 @@ namespace GalaScript
         public IParser GetParser()
         {
             return _parser;
-        }
-
-        public IEnumerable<string> GetKeywords()
-        {
-            return _keywords;
-        }
-
-        public void Register(string name, Func<object[], object> func)
-        {
-            _functions[name] = func;
         }
 
         public void Register(string name, Delegate func)
@@ -143,11 +120,11 @@ namespace GalaScript
             Array.Copy(arguments, 0, parameters, 1, arguments.Length);
             parameters[0] = caller;
 
-            var result = _operations.ContainsKey(name) ? _operations[name](parameters) : _functions[name](parameters);
+            var result = _functions[name](parameters);
 
             caller.SetAlias("ret", result);
 
-            if (!_operations.ContainsKey(name))
+            if (name != "push" && name != "peek" && name != "pop" && name != "goto" && name != "goif")
             {
                 EngineOperations.Push(caller, "eax");
             }

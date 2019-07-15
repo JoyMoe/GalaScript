@@ -10,19 +10,17 @@ namespace GalaScriptTests
     {
         private readonly IEngine _engine;
 
-        private static decimal _add(decimal acc, object argument) => acc + (decimal) argument;
+        private static decimal Add(params decimal[] arguments) =>
+            arguments.Aggregate(0.0m, (acc, argument) => acc + argument);
 
-        private static object Add(object[] arguments) => arguments.Skip(1).Aggregate(0.0m, _add);
-
-        private static string _echo(string str, object argument) => str + (string) argument;
-
-        private static object Echo(object[] arguments) => arguments.Skip(1).Aggregate("", _echo);
+        private static string Echo(params string[] arguments) =>
+            arguments.Aggregate("", (str, argument) => str + argument);
 
         public EngineTests()
         {
             _engine = new ScriptEngine();
-            _engine.Register("add", Add);
-            _engine.Register("echo", Echo);
+            _engine.Register("add", (Func<decimal[], decimal>)Add);
+            _engine.Register("echo", (Func<string[], string>)Echo);
         }
 
         [Test, Order(1)]

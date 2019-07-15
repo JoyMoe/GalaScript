@@ -10,10 +10,6 @@ namespace GalaScript.Interfaces
 
         IParser GetParser();
 
-        IEnumerable<string> GetKeywords();
-
-        void Register(string name, Func<object[], object> func);
-
         void Register(string name, Delegate func);
 
         object Call(IScriptEvaluator caller, string name, params object[] arguments);

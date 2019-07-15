@@ -4,11 +4,9 @@ namespace GalaScript.Internal
 {
     internal static class EngineOperations
     {
-        public static object Push(IScriptEvaluator script, string reg)
+        public static void Push(IScriptEvaluator script, string reg)
         {
             script.Push(reg);
-
-            return script.GetReturn();
         }
 
         public static object Peek(IScriptEvaluator script, string reg)
@@ -21,14 +19,12 @@ namespace GalaScript.Internal
             return script.Pop(reg);
         }
 
-        public static object Goto(IScriptEvaluator script, string label)
+        public static void Goto(IScriptEvaluator script, string label)
         {
             script.Goto(label);
-
-            return script.GetReturn();
         }
 
-        public static object Goif(IScriptEvaluator script, string label)
+        public static void Goif(IScriptEvaluator script, string label)
         {
             bool state;
 
@@ -49,8 +45,6 @@ namespace GalaScript.Internal
             {
                 script.Goto(label);
             }
-
-            return script.GetReturn();
         }
     }
 }

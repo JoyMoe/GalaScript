@@ -35,12 +35,14 @@ namespace GalaScript.Evaluators
                     case MacroEvaluator macro:
                         macro.ReplaceEnvironment(_aliases);
 
-                        engine.Register(macro.GetName(), objects =>
+                        object Macro(object[] objects)
                         {
                             macro.SetCaller(objects.FirstOrDefault() as IScriptEvaluator);
                             macro.SetArguments(objects.Skip(1));
                             return macro.Evaluate();
-                        });
+                        }
+
+                        engine.Register(macro.GetName(), (Func<object[], object>) Macro);
 
                         break;
                     case ScriptEvaluator sub:

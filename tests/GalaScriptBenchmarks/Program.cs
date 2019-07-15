@@ -13,9 +13,8 @@ namespace GalaScriptBenchmarks
     {
         private readonly IEngine _engine;
 
-        private static decimal _add(decimal acc, object argument) => acc + (decimal) argument;
-
-        private static object Add(object[] arguments) => arguments.Skip(1).Aggregate(0.0m, _add);
+        private static decimal Add(params decimal[] arguments) =>
+            arguments.Aggregate(0.0m, (acc, argument) => acc + argument);
 
         private const string Line = "[add 2 0]";
 
@@ -25,7 +24,7 @@ namespace GalaScriptBenchmarks
         {
             _engine = new ScriptEngine();
 
-            _engine.Register("add", Add);
+            _engine.Register("add", (Func<decimal[], decimal>)Add);
 
             _engine.Prepare(Line);
 
@@ -35,7 +34,7 @@ namespace GalaScriptBenchmarks
         [Benchmark]
         public object RunSingleLineNative()
         {
-            var result = Add(new object[] {2.0m, 0.0m});
+            var result = Add(2.0m, 0.0m);
 
             if (result is decimal ret && ret != 2.0m)
             {
@@ -78,9 +77,8 @@ namespace GalaScriptBenchmarks
     {
         private readonly IEngine _engine;
 
-        private static decimal _add(decimal acc, object argument) => acc + (decimal) argument;
-
-        private static object Add(object[] arguments) => arguments.Skip(1).Aggregate(0.0m, _add);
+        private static decimal Add(params decimal[] arguments) =>
+            arguments.Aggregate(0.0m, (acc, argument) => acc + argument);
 
         private const string Script = @"
 *label1
@@ -112,7 +110,7 @@ namespace GalaScriptBenchmarks
         {
             _engine = new ScriptEngine();
 
-            _engine.Register("add", Add);
+            _engine.Register("add", (Func<decimal[], decimal>) Add);
 
             _engine.Prepare(Script);
         }
