@@ -39,7 +39,8 @@ namespace GalaScript
             select new StringConstantEvaluator(text);
 
         private static readonly Parser<string> Comment =
-            from op in Parse.Char('#').Token()
+            from op in Parse.Char('#')
+            from space in Space.Optional()
             from comment in Parse.CharExcept('\n').Many().Text()
             select comment;
 
@@ -53,12 +54,14 @@ namespace GalaScript
             select new ConstantEvaluator(k);
 
         private static readonly Parser<IEvaluator> Label =
-            from op in Parse.Char('*').Token()
+            from op in Parse.Char('*')
+            from space in Space.Optional()
             from label in Token
             select new LabelEvaluator(label);
 
         private static readonly Parser<IEvaluator> Text =
-            from op in Parse.Char('-').Or(Parse.Char('+')).Token()
+            from op in Parse.Char('-').Or(Parse.Char('+'))
+            from space in Space.Optional()
             from text in Parse.CharExcept('\n').AtLeastOnce().Text().Optional()
             select new TextEvaluator(text.GetOrDefault(), op == '-');
 
@@ -100,7 +103,8 @@ namespace GalaScript
                 select new AliasEvaluator(_engine, name);
 
             Function =
-                from lparen in Parse.Char('[').Token()
+                from lparen in Parse.Char('[')
+                from _ in Space.Optional()
                 from name in Token
                 from space in Space.Optional()
                 from expr in Parse.Ref(() => Label.Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant))
@@ -111,12 +115,15 @@ namespace GalaScript
 
             Alias =
                 from func in Function
-                from op in Parse.Char(':').Token()
+                from leading in Space.Optional()
+                from op in Parse.Char(':')
+                from trailing in Space.Optional()
                 from name in Variable
                 select new AliasEvaluator(_engine, name, func);
 
             Macro =
-                from op in Parse.Char('!').Token()
+                from op in Parse.Char('!')
+                from _ in Space.Optional()
                 from name in Token
                 from space in Space.Optional()
                 from parameters in MacroParameters.Optional()
@@ -136,7 +143,9 @@ namespace GalaScript
         public IEnumerable<IEvaluator> Prepare(string str)
         {
             var parser =
+                from leading in Space.Optional()
                 from evaluator in Evaluator.Optional()
+                from space in Space.Optional()
                 from comment in Comment.Optional()
                 from trailing in Space.Optional()
                 from eol in Parse.LineTerminator

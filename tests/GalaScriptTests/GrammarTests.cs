@@ -123,19 +123,15 @@ namespace GalaScriptTests
         [Test]
         public void TestMacro()
         {
-            var foo = _parser.Prepare(@"
-!foo [$a $b $c]
+            var foo = _parser.Prepare(@"!foo [$a $b $c]
     [add $a $b $c]
-!
-").FirstOrDefault();
+!").FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(foo);
 
-            var bar = _parser.Prepare(@"
-!bar
+            var bar = _parser.Prepare(@"!bar
     [add 2 2 2]
-!
-").FirstOrDefault();
+!").FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(bar);
         }
@@ -167,7 +163,7 @@ result = ""hello""
         {
             var exps = _parser.Prepare(File.ReadAllText("test.gs"));
 
-            Assert.AreEqual(19, exps.Count());
+            Assert.AreEqual(24, exps.Count());
         }
     }
 }
