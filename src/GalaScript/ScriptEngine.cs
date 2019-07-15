@@ -12,7 +12,6 @@ namespace GalaScript
 {
     public class ScriptEngine : IEngine
     {
-        private IParser _parser;
 
         private readonly Dictionary<string, Func<IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IScriptEvaluator, object[], object>>();
 
@@ -30,20 +29,12 @@ namespace GalaScript
 
         public ScriptEngine()
         {
-            SetParser(new ExpressionParser(this));
+            Parser = new ExpressionParser(this);
 
             PrepareOperations();
         }
 
-        public void SetParser(IParser parser)
-        {
-            _parser = parser;
-        }
-
-        public IParser GetParser()
-        {
-            return _parser;
-        }
+        public IParser Parser { get; set; }
 
         public void Register(string name, Delegate func)
         {
@@ -141,29 +132,19 @@ namespace GalaScript
 
         public void SetAlias(IScriptEvaluator caller, string name, object value)
         {
-            if (caller == null)
-            {
-                caller = _script;
-            }
-
             caller.SetAlias(name, value);
         }
 
         public object GetAlias(IScriptEvaluator caller, string name)
         {
-            if (caller == null)
-            {
-                caller = _script;
-            }
-
             return caller.GetAlias(name);
         }
 
         public void Prepare(string str, Encoding encoding = null)
         {
             _script = File.Exists(str)
-                ? _parser.LoadFile(str, encoding)
-                : _parser.LoadString(str);
+                ? Parser.LoadFile(str, encoding)
+                : Parser.LoadString(str);
 
             _script.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
         }

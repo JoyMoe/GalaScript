@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using GalaScript;
 using GalaScript.Evaluators;
 using GalaScript.Interfaces;
@@ -14,7 +15,7 @@ namespace GalaScriptTests
         public GrammarTests()
         {
             var engine = new ScriptEngine();
-            _parser = engine.GetParser();
+            _parser = engine.Parser;
 
             var js =
                 from op in Parse.String("@js").Token()
@@ -122,19 +123,15 @@ namespace GalaScriptTests
         [Test]
         public void TestMacro()
         {
-            var foo = _parser.Prepare(@"
-!foo [$a $b $c]
+            var foo = _parser.Prepare(@"!foo [$a $b $c]
     [add $a $b $c]
-!
-").FirstOrDefault();
+!").FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(foo);
 
-            var bar = _parser.Prepare(@"
-!bar
+            var bar = _parser.Prepare(@"!bar
     [add 2 2 2]
-!
-").FirstOrDefault();
+!").FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(bar);
         }
@@ -164,33 +161,9 @@ result = ""hello""
         [Test]
         public void TestScript()
         {
-            var exps = _parser.Prepare(@"
-*label1
-[add 1 1]:$va
-[pop ebx]
-[goto *label3]
+            var exps = _parser.Prepare(File.ReadAllText("test.gs"));
 
-* label2
-[add ret 2]
-[goto *end]
-
-*start # start is a special label
-# start here
-- Hello World
-- GalaScript
-+ Test
-[add 2 2]
-[push ebx]
-[goto *label1]
-
-* label3
-[add $va 2]
-[goif *label2]
-
-*end
-");
-
-            Assert.AreEqual(19, exps.Count());
+            Assert.AreEqual(24, exps.Count());
         }
     }
 }

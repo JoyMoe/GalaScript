@@ -5,11 +5,12 @@ The GalaScript script language
 [![AppVeyor](https://img.shields.io/appveyor/ci/JoyMoe/GalaScript.svg)](https://ci.appveyor.com/project/JoyMoe/GalaScript)
 [![AppVeyor tests](https://img.shields.io/appveyor/tests/JoyMoe/GalaScript.svg)](https://ci.appveyor.com/project/JoyMoe/GalaScript)
 [![Codecov](https://img.shields.io/codecov/c/github/JoyMoe/GalaScript.svg)](https://codecov.io/gh/JoyMoe/GalaScript)
-[![Nuget](https://img.shields.io/nuget/v/GalaScript.svg)](https://www.nuget.org/packages/GalaScript)
-[![Nuget](https://img.shields.io/nuget/vpre/GalaScript.svg)](https://www.nuget.org/packages/GalaScript/absoluteLatest)
-[![MyGet (with prereleases)](https://img.shields.io/myget/galaengine/vpre/GalaScript.svg)](http://myget.org/feed/galaengine/package/nuget/GalaScript)
 [![license](https://img.shields.io/github/license/JoyMoe/GalaScript.svg)](https://raw.githubusercontent.com/JoyMoe/GalaScript/master/LICENSE)
 [![CLA assistant](https://cla-assistant.io/readme/badge/JoyMoe/GalaScript)](https://cla-assistant.io/JoyMoe/GalaScript)
+
+[![Nuget](https://img.shields.io/nuget/v/GalaScript.svg)](https://www.nuget.org/packages/GalaScript)
+[![Nuget](https://img.shields.io/nuget/vpre/GalaScript.svg)](https://www.nuget.org/packages/GalaScript/absoluteLatest)
+[![MyGet (with prereleases)](https://img.shields.io/myget/galaengine/vpre/GalaScript.svg?label=MyGet)](http://myget.org/feed/galaengine/package/nuget/GalaScript)
 
 ## Build
 

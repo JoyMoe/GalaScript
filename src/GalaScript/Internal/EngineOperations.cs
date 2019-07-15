@@ -28,7 +28,7 @@ namespace GalaScript.Internal
         {
             bool state;
 
-            switch (script.GetReturn())
+            switch (script.Return)
             {
                 case string @string:
                     state = !string.IsNullOrWhiteSpace(@string);
@@ -37,7 +37,7 @@ namespace GalaScript.Internal
                     state = @decimal > 0;
                     break;
                 default:
-                    state = script.GetReturn() != null;
+                    state = script.Return != null;
                     break;
             }
 

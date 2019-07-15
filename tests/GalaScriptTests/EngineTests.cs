@@ -119,36 +119,23 @@ namespace GalaScriptTests
 ");
 
             Assert.AreEqual(6.0, _engine.Evaluate());
+
+            _engine.Prepare(@"
+!bar
+    [add 2 2]
+    [add ret 2]
+!
+
+[bar]
+");
+
+            Assert.AreEqual(6.0, _engine.Evaluate());
         }
 
         [Test, Order(7)]
         public void TestGotoGoif()
         {
-            _engine.Prepare(@"
-*label1
-[add 1 1]:$va
-[pop ebx]
-[goto *label3]
-
-* label2
-[add ret 2]
-[goto *end]
-
-*start # start is a special label
-# start here
-- Hello World
-- GalaScript
-+ Test
-[add 2 2]
-[push ebx]
-[goto *label1]
-
-* label3
-[add $va 2]
-[goif *label2]
-
-*end
-");
+            _engine.Prepare("test.gs");
 
             Assert.AreEqual(6.0, _engine.Evaluate());
 

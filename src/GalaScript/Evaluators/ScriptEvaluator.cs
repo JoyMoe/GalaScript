@@ -9,26 +9,30 @@ namespace GalaScript.Evaluators
 {
     public class ScriptEvaluator : IScriptEvaluator
     {
-        private LinkedListNode<IEvaluator> _current;
-        private readonly LinkedList<IEvaluator> _script = new LinkedList<IEvaluator>();
-        private readonly Dictionary<string, LinkedListNode<IEvaluator>> _labels = new Dictionary<string, LinkedListNode<IEvaluator>>();
+        protected readonly IEngine Engine;
+
+        protected long Current;
+        protected readonly Dictionary<long, IEvaluator> Script = new Dictionary<long, IEvaluator>();
+        protected readonly Dictionary<string, long> Labels = new Dictionary<string, long>();
 
         private IDropOutStack<object> _eax = new DropOutStack<object>(10);
         private IDropOutStack<object> _ebx = new DropOutStack<object>(10);
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
-        public ScriptEvaluator(IEngine engine, string str, bool isRootScriptEvaluator = true)
+        protected ScriptEvaluator(IEngine engine)
         {
-            var evaluators = engine.GetParser().Prepare(str);
+            Engine = engine;
+        }
+
+        public ScriptEvaluator(IEngine engine, string str) : this(engine)
+        {
+            var evaluators = Engine.Parser.Prepare(str);
 
             foreach (var exp in evaluators)
             {
                 if (exp == null) continue;
 
-                if (!isRootScriptEvaluator)
-                {
-                    exp.SetCaller(this);
-                }
+                exp.SetCaller(this);
 
                 switch (exp)
                 {
@@ -38,7 +42,11 @@ namespace GalaScript.Evaluators
                         object Macro(object[] objects)
                         {
                             macro.SetCaller(objects.FirstOrDefault() as IScriptEvaluator);
-                            macro.SetArguments(objects.Skip(1));
+
+                            if (objects.Length > 1)
+                            {
+                                macro.SetArguments(objects.Skip(1).ToArray());
+                            }
                             return macro.Evaluate();
                         }
 
@@ -49,14 +57,14 @@ namespace GalaScript.Evaluators
                         // TODO: add option to config ReplaceEnvironment in sub-script
                         sub.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
                         break;
+                    case LabelEvaluator label:
+                        Labels[label.Name] = Current;
+                        break;
                 }
 
-                _script.AddLast(exp);
+                Script[Current] = exp;
 
-                if (exp is LabelEvaluator label)
-                {
-                    _labels[label.GetName()] = _script.Last;
-                }
+                Current++;
             }
 
             Reset();
@@ -67,21 +75,13 @@ namespace GalaScript.Evaluators
             // TODO: Set caller for Script
         }
 
-        public object Evaluate()
-        {
-            while (_current != null)
-            {
-                StepOut();
-            }
-
-            return GetReturn();
-        }
+        public object Return => GetAlias("ret");
 
         public void Goto(string label)
         {
-            if (_labels.TryGetValue(label, out var node))
+            if (Labels.TryGetValue(label, out var no))
             {
-                _current = node;
+                Current = no;
             }
             else
             {
@@ -94,26 +94,22 @@ namespace GalaScript.Evaluators
             switch (origin)
             {
                 case SeekOrigin.Begin:
-                    _current = _script.First;
+                    Current = offset;
                     break;
                 case SeekOrigin.Current:
+                    Current += offset;
                     break;
                 case SeekOrigin.End:
-                    _current = _script.Last;
+                    Current = Script.Count + offset - 1;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
-            }
-
-            for (var i = 0; i < offset; i++)
-            {
-                _current = _current?.Next;
             }
         }
 
         public void Reset()
         {
-            if (_labels.ContainsKey("start"))
+            if (Labels.ContainsKey("start"))
             {
                 Goto("start");
             }
@@ -125,21 +121,26 @@ namespace GalaScript.Evaluators
 
         public object StepOut()
         {
-            var current = _current.Value;
+            var current = Script[Current];
 
             if (current != null && current is MacroEvaluator == false)
             {
-                _current.Value?.Evaluate();
+                current.Evaluate();
             }
 
             Seek(1, SeekOrigin.Current);
 
-            return GetReturn();
+            return Return;
         }
 
-        public object GetReturn()
+        public object Evaluate()
         {
-            return GetAlias("ret");
+            while (Current < Script.Count)
+            {
+                StepOut();
+            }
+
+            return Return;
         }
 
         public void ReplaceEnvironment(Dictionary<string, object> aliases)
@@ -178,10 +179,10 @@ namespace GalaScript.Evaluators
             switch (reg)
             {
                 case "eax":
-                    _eax.Push(GetReturn());
+                    _eax.Push(Return);
                     break;
                 case "ebx":
-                    _ebx.Push(GetReturn());
+                    _ebx.Push(Return);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(reg));
