@@ -14,7 +14,7 @@ namespace GalaScript
     {
         private IParser _parser;
 
-        private readonly Dictionary<string, Func<object[], object>> _functions = new Dictionary<string, Func<object[], object>>();
+        private readonly Dictionary<string, Func<IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IScriptEvaluator, object[], object>>();
 
         private IScriptEvaluator _script;
 
@@ -48,28 +48,44 @@ namespace GalaScript
         public void Register(string name, Delegate func)
         {
             var funcParameters = func.Method.GetParameters();
-            var paraExpr = Expression.Parameter(typeof(object[]), "obj");
-            var callExprs = new Expression[funcParameters.Length];
 
-            var isCallerRequired = 1;
+            var callerExpr = Expression.Parameter(typeof(IScriptEvaluator), "caller");
+            var paraExpr = Expression.Parameter(typeof(object[]), "obj");
+            var callExprs = new List<Expression>(funcParameters.Length);
+
+
             var converter = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) });
 
-            for (var i = 0; i < funcParameters.Length; i++)
+            var objIndex = 0;
+            foreach (var info in funcParameters)
             {
-                var info = funcParameters[i];
-                //if (info.ParameterType == typeof(IEngine))
-                //{
-                //    callExprs[i] = Expression.Constant(this);
-                //}
-                if (info.ParameterType == typeof(IScriptEvaluator))
+                var pType = info.ParameterType;
+                if (pType.IsValueType || pType == typeof(string))
                 {
-                    callExprs[i] = Expression.Convert(Expression.ArrayIndex(paraExpr, Expression.Constant(0)), typeof(IScriptEvaluator));
-                    isCallerRequired = 0;
+                    var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex++)), Expression.Constant(pType));
+                    callExprs.Add(Expression.Convert(convert, pType));
                 }
-                else if (info.ParameterType.IsValueType || info.ParameterType == typeof(string))
+                else if (pType == typeof(IScriptEvaluator))
                 {
-                    var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(i + isCallerRequired)), Expression.Constant(info.ParameterType));
-                    callExprs[i] = Expression.Convert(convert, info.ParameterType);
+                    callExprs.Add(callerExpr);
+                }
+                else if (Array.IndexOf(funcParameters, info) == funcParameters.Length - 1 &&
+                    pType.BaseType == typeof(Array) &&
+                    pType.GetElementType() is Type elementType && (elementType.IsValueType || elementType == typeof(string)))
+                {
+                    Func<object[], int, Type, IEnumerable<object>> arrayConverter = (obj, start, type) => obj.Skip(start).Select(o => Convert.ChangeType(o, type));
+                    var ofTypeMethod = typeof(Enumerable).GetMethod("OfType").MakeGenericMethod(elementType);
+                    var toArrayMethod= typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
+
+                    // objs.Skip(objIndex).Select(0=>Covert.ChangeType(o, type)).OfType<elementType>().ToArray()
+                    var convertCallExpr = Expression.Call(toArrayMethod,
+                        Expression.Call(ofTypeMethod,
+                            Expression.Call(Expression.Constant(arrayConverter.Target), arrayConverter.Method,
+                                paraExpr,
+                                Expression.Constant(objIndex),
+                                Expression.Constant(elementType))));
+
+                    callExprs.Add(convertCallExpr);
                 }
                 else
                 {
@@ -81,23 +97,23 @@ namespace GalaScript
 
             var isAction = func.Method.ReturnType == typeof(void);
 
-            Func<object[], object> fun;
+            Func<IScriptEvaluator, object[], object> fun;
             if(isAction)
             {
-                var _actionCaller = Expression.Lambda<Action<object[]>>(body, paraExpr).Compile();
-                fun = (obj) =>
+                var _actionCaller = Expression.Lambda<Action<IScriptEvaluator, object[]>>(body, callerExpr, paraExpr).Compile();
+                fun = (caller, obj) =>
                 {
-                    _actionCaller(obj);
+                    _actionCaller(caller, obj);
                     return null;
                 };
             }
             else
             {
                 var boxed = Expression.Convert(body, typeof(object));
-                var _funcCaller = Expression.Lambda<Func<object[], object>>(boxed, paraExpr).Compile();
-                fun = (obj) =>
+                var _funcCaller = Expression.Lambda<Func<IScriptEvaluator, object[], object>>(boxed, callerExpr, paraExpr).Compile();
+                fun = (caller, obj) =>
                 {
-                    return _funcCaller(obj);
+                    return _funcCaller(caller, obj);
                 };
             }
 
@@ -111,11 +127,7 @@ namespace GalaScript
                 caller = _script;
             }
 
-            var parameters = new object[arguments.Length + 1];
-            Array.Copy(arguments, 0, parameters, 1, arguments.Length);
-            parameters[0] = caller;
-
-            var result = _functions[name](parameters);
+            var result = _functions[name](caller, arguments);
 
             caller.SetAlias("ret", result);
 
