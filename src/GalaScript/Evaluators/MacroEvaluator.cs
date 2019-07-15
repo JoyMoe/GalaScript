@@ -10,7 +10,7 @@ namespace GalaScript.Evaluators
         public MacroEvaluator(IEngine engine, string name, string[] parameters, string str) : base(engine)
         {
             Name = name;
-            _parameters = parameters;
+            _parameters = parameters ?? new string[0];
 
             var evaluators = Engine.Parser.Prepare(str);
 

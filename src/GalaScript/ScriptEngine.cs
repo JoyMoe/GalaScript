@@ -21,6 +21,8 @@ namespace GalaScript
         private IDropOutStack<object> _ebx = new DropOutStack<object>(10);
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
+        private static readonly object _void = new object();
+
         private void PrepareOperations()
         {
             foreach (var method in typeof(EngineOperations).GetMethods(BindingFlags.Static | BindingFlags.Public))
@@ -60,23 +62,31 @@ namespace GalaScript
                 {
                     callExprs.Add(callerExpr);
                 }
-                else if (Array.IndexOf(funcParameters, info) == funcParameters.Length - 1 &&
-                    pType.BaseType == typeof(Array) &&
-                    pType.GetElementType() is Type elementType && (elementType.IsValueType || elementType == typeof(string)))
+                else if (Array.IndexOf(funcParameters, info) == funcParameters.Length - 1 && pType.BaseType == typeof(Array) && pType.GetElementType() is Type elementType)
                 {
-                    Func<object[], int, Type, IEnumerable<object>> arrayConverter = (obj, start, type) => obj.Skip(start).Select(o => Convert.ChangeType(o, type));
+
                     var ofTypeMethod = typeof(Enumerable).GetMethod("OfType").MakeGenericMethod(elementType);
-                    var toArrayMethod= typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
+                    var toArrayMethod = typeof(Enumerable).GetMethod("ToArray").MakeGenericMethod(elementType);
+                    var skipMethod = typeof(Enumerable).GetMethod("Skip").MakeGenericMethod(elementType);
 
-                    // objs.Skip(objIndex).Select(0=>Covert.ChangeType(o, type)).OfType<elementType>().ToArray()
-                    var convertCallExpr = Expression.Call(toArrayMethod,
-                        Expression.Call(ofTypeMethod,
-                            Expression.Call(Expression.Constant(arrayConverter.Target), arrayConverter.Method,
-                                paraExpr,
-                                Expression.Constant(objIndex),
-                                Expression.Constant(elementType))));
+                    if (elementType.IsValueType || elementType == typeof(string))
+                    {
+                        Func<object[], int, Type, IEnumerable<object>> arrayConverter = (obj, start, type) => obj.Skip(start).Select(o => Convert.ChangeType(o, type));
 
-                    callExprs.Add(convertCallExpr);
+                        // objs.Skip(objIndex).Select(0=>Covert.ChangeType(o, type)).OfType<elementType>().ToArray()
+                        var convertCallExpr = Expression.Call(toArrayMethod,
+                            Expression.Call(ofTypeMethod,
+                                Expression.Call(Expression.Constant(arrayConverter.Target), arrayConverter.Method,
+                                    paraExpr,
+                                    Expression.Constant(objIndex),
+                                    Expression.Constant(elementType))));
+
+                        callExprs.Add(convertCallExpr);
+                    }
+                    else if(elementType == typeof(object))
+                    {
+                        callExprs.Add(Expression.Call(toArrayMethod, Expression.Call(skipMethod, paraExpr, Expression.Constant(objIndex))));
+                    }
                 }
                 else
                 {
@@ -95,7 +105,7 @@ namespace GalaScript
                 fun = (caller, obj) =>
                 {
                     _actionCaller(caller, obj);
-                    return null;
+                    return _void;
                 };
             }
             else
@@ -118,13 +128,16 @@ namespace GalaScript
                 caller = _script;
             }
 
-            var result = _functions[name](caller, arguments);
+             var result = _functions[name](caller, arguments);
 
-            caller.SetAlias("ret", result);
-
-            if (name != "push" && name != "peek" && name != "pop" && name != "goto" && name != "goif")
+            if(result != _void)
             {
-                EngineOperations.Push(caller, "eax");
+                caller.SetAlias("ret", result);
+
+                if (name != "push" && name != "peek" && name != "pop" && name != "goto" && name != "goif")
+                {
+                    EngineOperations.Push(caller, "eax");
+                }
             }
 
             return result;

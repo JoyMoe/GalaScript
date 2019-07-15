@@ -42,15 +42,12 @@ namespace GalaScript.Evaluators
                         object Macro(object[] objects)
                         {
                             macro.SetCaller(objects.FirstOrDefault() as IScriptEvaluator);
+                            macro.SetArguments(objects.ToArray());
 
-                            if (objects.Length > 1)
-                            {
-                                macro.SetArguments(objects.Skip(1).ToArray());
-                            }
                             return macro.Evaluate();
                         }
 
-                        engine.Register(macro.GetName(), (Func<object[], object>) Macro);
+                        engine.Register(macro.Name, (Func<object[], object>) Macro);
 
                         break;
                     case ScriptEvaluator sub:
