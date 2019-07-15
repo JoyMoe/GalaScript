@@ -8,7 +8,7 @@ namespace GalaScript.Internal
         {
             script.Push(reg);
 
-            return script.GetReturn();
+            return script.Return;
         }
 
         public static object Peek(IScriptEvaluator script, string reg)
@@ -25,14 +25,14 @@ namespace GalaScript.Internal
         {
             script.Goto(label);
 
-            return script.GetReturn();
+            return script.Return;
         }
 
         public static object Goif(IScriptEvaluator script, string label)
         {
             bool state;
 
-            switch (script.GetReturn())
+            switch (script.Return)
             {
                 case string @string:
                     state = !string.IsNullOrWhiteSpace(@string);
@@ -41,7 +41,7 @@ namespace GalaScript.Internal
                     state = @decimal > 0;
                     break;
                 default:
-                    state = script.GetReturn() != null;
+                    state = script.Return != null;
                     break;
             }
 
@@ -50,7 +50,7 @@ namespace GalaScript.Internal
                 script.Goto(label);
             }
 
-            return script.GetReturn();
+            return script.Return;
         }
     }
 }

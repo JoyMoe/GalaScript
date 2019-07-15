@@ -29,7 +29,7 @@ namespace GalaScriptBenchmarks
 
             _engine.Prepare(Line);
 
-            _exp = _engine.GetParser().Prepare(Line).FirstOrDefault();
+            _exp = _engine.Parser.Prepare(Line).FirstOrDefault();
         }
 
         [Benchmark]

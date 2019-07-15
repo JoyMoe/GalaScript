@@ -5,6 +5,8 @@ namespace GalaScript.Interfaces
 {
     public interface IScriptEvaluator : IEvaluator
     {
+        object Return { get; }
+
         void Goto(string label);
 
         void Seek(long offset, SeekOrigin origin);
@@ -12,8 +14,6 @@ namespace GalaScript.Interfaces
         void Reset();
 
         object StepOut();
-
-        object GetReturn();
 
         void ReplaceEnvironment(Dictionary<string, object> aliases = null);
 

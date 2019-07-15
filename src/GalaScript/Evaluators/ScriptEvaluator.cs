@@ -24,7 +24,7 @@ namespace GalaScript.Evaluators
 
         public ScriptEvaluator(IEngine engine, string str)
         {
-            var evaluators = engine.GetParser().Prepare(str);
+            var evaluators = engine.Parser.Prepare(str);
 
             foreach (var exp in evaluators)
             {
@@ -37,7 +37,7 @@ namespace GalaScript.Evaluators
                     case MacroEvaluator macro:
                         macro.ReplaceEnvironment(_aliases);
 
-                        engine.Register(macro.GetName(), objects =>
+                        engine.Register(macro.Name, objects =>
                         {
                             macro.SetCaller(objects.FirstOrDefault() as IScriptEvaluator);
 
@@ -54,7 +54,7 @@ namespace GalaScript.Evaluators
                         sub.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
                         break;
                     case LabelEvaluator label:
-                        _labels[label.GetName()] = _script.Last;
+                        _labels[label.Name] = _script.Last;
                         break;
                 }
 
@@ -76,8 +76,10 @@ namespace GalaScript.Evaluators
                 StepOut();
             }
 
-            return GetReturn();
+            return Return;
         }
+
+        public object Return => GetAlias("ret");
 
         public void Goto(string label)
         {
@@ -136,12 +138,7 @@ namespace GalaScript.Evaluators
 
             Seek(1, SeekOrigin.Current);
 
-            return GetReturn();
-        }
-
-        public object GetReturn()
-        {
-            return GetAlias("ret");
+            return Return;
         }
 
         public void ReplaceEnvironment(Dictionary<string, object> aliases)
@@ -180,10 +177,10 @@ namespace GalaScript.Evaluators
             switch (reg)
             {
                 case "eax":
-                    _eax.Push(GetReturn());
+                    _eax.Push(Return);
                     break;
                 case "ebx":
-                    _ebx.Push(GetReturn());
+                    _ebx.Push(Return);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(reg));

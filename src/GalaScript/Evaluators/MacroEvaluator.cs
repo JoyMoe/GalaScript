@@ -5,15 +5,14 @@ namespace GalaScript.Evaluators
 {
     public class MacroEvaluator : ScriptEvaluator, INamedEvaluator
     {
-        private readonly string _name;
         private readonly string[] _parameters;
 
         public MacroEvaluator(IEngine engine, string name, string[] parameters, string str)
         {
-            _name = name;
+            Name = name;
             _parameters = parameters;
 
-            var evaluators = engine.GetParser().Prepare(str);
+            var evaluators = engine.Parser.Prepare(str);
 
             foreach (var exp in evaluators)
             {
@@ -27,7 +26,7 @@ namespace GalaScript.Evaluators
                     case ScriptEvaluator _:
                         throw new NotSupportedException("Nested Macro is not supported.");
                     case LabelEvaluator label:
-                        _labels[label.GetName()] = _script.Last;
+                        _labels[label.Name] = _script.Last;
                         break;
                 }
 
@@ -37,11 +36,6 @@ namespace GalaScript.Evaluators
             Reset();
         }
 
-        public string GetName()
-        {
-            return _name;
-        }
-
         public void SetArguments(object[] arguments)
         {
             for (var i = 0; i < _parameters.Length; i++)
@@ -49,5 +43,7 @@ namespace GalaScript.Evaluators
                 SetAlias(_parameters[i], arguments[i]);
             }
         }
+
+        public string Name { get; }
     }
 }

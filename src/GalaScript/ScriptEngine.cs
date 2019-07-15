@@ -10,8 +10,6 @@ namespace GalaScript
 {
     public class ScriptEngine : IEngine
     {
-        private IParser _parser;
-
         private readonly IEnumerable<string> _keywords = new string[0];
 
         private readonly Dictionary<string, Func<object[], object>> _functions = new Dictionary<string, Func<object[], object>>();
@@ -47,20 +45,12 @@ namespace GalaScript
 
         public ScriptEngine()
         {
-            SetParser(new ExpressionParser(this));
+            Parser = new ExpressionParser(this);
 
             PrepareOperations();
         }
 
-        public void SetParser(IParser parser)
-        {
-            _parser = parser;
-        }
-
-        public IParser GetParser()
-        {
-            return _parser;
-        }
+        public IParser Parser { get; set; }
 
         public IEnumerable<string> GetKeywords()
         {
@@ -103,8 +93,8 @@ namespace GalaScript
         public void Prepare(string str, Encoding encoding = null)
         {
             _script = File.Exists(str)
-                ? _parser.LoadFile(str, encoding)
-                : _parser.LoadString(str);
+                ? Parser.LoadFile(str, encoding)
+                : Parser.LoadString(str);
 
             _script.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
         }

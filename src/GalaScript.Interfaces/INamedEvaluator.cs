@@ -2,6 +2,6 @@
 {
     public interface INamedEvaluator
     {
-        string GetName();
+        string Name { get; }
     }
 }

@@ -6,9 +6,7 @@ namespace GalaScript.Interfaces
 {
     public interface IEngine
     {
-        void SetParser(IParser parser);
-
-        IParser GetParser();
+        IParser Parser { get; set; }
 
         IEnumerable<string> GetKeywords();
 

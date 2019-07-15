@@ -15,7 +15,7 @@ namespace GalaScriptTests
         public GrammarTests()
         {
             var engine = new ScriptEngine();
-            _parser = engine.GetParser();
+            _parser = engine.Parser;
 
             var js =
                 from op in Parse.String("@js").Token()

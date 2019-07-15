@@ -4,11 +4,9 @@ namespace GalaScript.Evaluators
 {
     public class LabelEvaluator : IEvaluator, INamedEvaluator
     {
-        private readonly string _label;
-
         public LabelEvaluator(string label)
         {
-            _label = label;
+            Name = label;
         }
 
         public void SetCaller(IScriptEvaluator caller)
@@ -18,12 +16,9 @@ namespace GalaScript.Evaluators
 
         public object Evaluate()
         {
-            return _label;
+            return Name;
         }
 
-        public string GetName()
-        {
-            return _label;
-        }
+        public string Name { get; }
     }
 }
