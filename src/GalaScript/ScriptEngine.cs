@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 using System.Linq.Expressions;
 using GalaScript.Internal;
 using GalaScript.Interfaces;
+using System.Reflection;
 
 namespace GalaScript
 {
@@ -22,15 +24,8 @@ namespace GalaScript
 
         private void PrepareOperations()
         {
-            Register("push", (Action<IScriptEvaluator, string>)EngineOperations.Push);
-
-            Register("peek", (Func<IScriptEvaluator, string, object>)EngineOperations.Peek);
-
-            Register("pop", (Func<IScriptEvaluator, string, object>)EngineOperations.Pop);
-
-            Register("goto", (Action<IScriptEvaluator, string>)EngineOperations.Goto);
-
-            Register("goif", (Action<IScriptEvaluator, string>)EngineOperations.Goif);
+            foreach (var method in typeof(EngineOperations).GetMethods(BindingFlags.Static | BindingFlags.Public))
+                this.Register(method.Name.ToLower(), method);
         }
 
         public ScriptEngine()
@@ -68,10 +63,10 @@ namespace GalaScript
                 //}
                 if (info.ParameterType == typeof(IScriptEvaluator))
                 {
-                    callExprs[i] = Expression.ArrayIndex(paraExpr, Expression.Constant(0));
+                    callExprs[i] = Expression.Convert(Expression.ArrayIndex(paraExpr, Expression.Constant(0)), typeof(IScriptEvaluator));
                     isCallerRequired = 0;
                 }
-                if (info.ParameterType.IsValueType || info.ParameterType == typeof(string))
+                else if (info.ParameterType.IsValueType || info.ParameterType == typeof(string))
                 {
                     var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(i + isCallerRequired)), Expression.Constant(info.ParameterType));
                     callExprs[i] = Expression.Convert(convert, info.ParameterType);
@@ -82,7 +77,7 @@ namespace GalaScript
                 }
             }
 
-            var body = Expression.Call(Expression.Constant(func.Target), func.Method, callExprs);
+            var body = Expression.Call(func.Method.IsStatic ? null : Expression.Constant(func.Target), func.Method, callExprs);
 
             var isAction = func.Method.ReturnType == typeof(void);
 
