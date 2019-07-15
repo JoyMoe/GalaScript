@@ -37,12 +37,14 @@ deploy:
     symbol_server: https://www.myget.org/F/galaengine/symbols/api/v2/package
     api_key:
       secure: 9EKvm3W60xQMcta7WZW0BISOOISgd1535xd3ie/D/uLcuFAjzDLBRzn2myEcd5xC
+    on:
+      branch: master
   - provider: NuGet
     name: NuGet
     api_key:
       secure: oYRL+tdfczOc3hZH5CxipwwtvIXl+68XI375/ZBbty6/MvaGdikD1oeC9wkYwkn9
     on:
-      appveyor_repo_tag: true
+      APPVEYOR_REPO_TAG: true
   - provider: GitHub
     name: GitHub Release
     auth_token:
@@ -52,4 +54,4 @@ deploy:
     prerelease: false
     force_update: true
     on:
-      appveyor_repo_tag: true
+      APPVEYOR_REPO_TAG: true
