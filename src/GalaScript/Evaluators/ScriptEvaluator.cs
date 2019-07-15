@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using GalaScript.Interfaces;
 using GalaScript.Internal;
 
@@ -11,7 +12,6 @@ namespace GalaScript.Evaluators
     {
         protected readonly IEngine Engine;
 
-        protected long Current;
         protected readonly Dictionary<long, IEvaluator> Script = new Dictionary<long, IEvaluator>();
         protected readonly Dictionary<string, long> Labels = new Dictionary<string, long>();
 
@@ -55,13 +55,13 @@ namespace GalaScript.Evaluators
                         sub.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
                         break;
                     case LabelEvaluator label:
-                        Labels[label.Name] = Current;
+                        Labels[label.Name] = CurrentLineNumber;
                         break;
                 }
 
-                Script[Current] = exp;
+                Script[CurrentLineNumber] = exp;
 
-                Current++;
+                CurrentLineNumber++;
             }
 
             Reset();
@@ -72,13 +72,23 @@ namespace GalaScript.Evaluators
             // TODO: Set caller for Script
         }
 
+        public long CurrentLineNumber { get; protected set; }
+
+        public IEvaluator Current => Script[CurrentLineNumber];
+
+        public IDropOutStack<object> Eax => _eax;
+
+        public IDropOutStack<object> Ebx => _ebx;
+
+        public Dictionary<string, object> Aliases => _aliases;
+
         public object Return => GetAlias("ret");
 
         public void Goto(string label)
         {
             if (Labels.TryGetValue(label, out var no))
             {
-                Current = no;
+                CurrentLineNumber = no;
             }
             else
             {
@@ -91,13 +101,13 @@ namespace GalaScript.Evaluators
             switch (origin)
             {
                 case SeekOrigin.Begin:
-                    Current = offset;
+                    CurrentLineNumber = offset;
                     break;
                 case SeekOrigin.Current:
-                    Current += offset;
+                    CurrentLineNumber += offset;
                     break;
                 case SeekOrigin.End:
-                    Current = Script.Count + offset - 1;
+                    CurrentLineNumber = Script.Count + offset - 1;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
@@ -118,7 +128,7 @@ namespace GalaScript.Evaluators
 
         public object StepOut()
         {
-            var current = Script[Current];
+            var current = Script[CurrentLineNumber];
 
             if (current != null && current is MacroEvaluator == false)
             {
@@ -132,8 +142,15 @@ namespace GalaScript.Evaluators
 
         public object Evaluate()
         {
-            while (Current < Script.Count)
+            while (CurrentLineNumber < Script.Count)
             {
+                Engine.Current = this;
+
+                while (Engine.Paused)
+                {
+                    Thread.Sleep(5);
+                }
+
                 StepOut();
             }
 

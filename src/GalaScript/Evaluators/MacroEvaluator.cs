@@ -26,13 +26,13 @@ namespace GalaScript.Evaluators
                     case ScriptEvaluator _:
                         throw new NotSupportedException("Nested Macro is not supported.");
                     case LabelEvaluator label:
-                        Labels[label.Name] = Current;
+                        Labels[label.Name] = CurrentLineNumber;
                         break;
                 }
 
-                Script[Current] = exp;
+                Script[CurrentLineNumber] = exp;
 
-                Current++;
+                CurrentLineNumber++;
             }
 
             Reset();

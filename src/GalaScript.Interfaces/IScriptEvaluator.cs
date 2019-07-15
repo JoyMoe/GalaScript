@@ -5,6 +5,16 @@ namespace GalaScript.Interfaces
 {
     public interface IScriptEvaluator : IEvaluator
     {
+        long CurrentLineNumber { get; }
+
+        IEvaluator Current { get; }
+
+        IDropOutStack<object> Eax { get; }
+
+        IDropOutStack<object> Ebx { get; }
+
+        Dictionary<string, object> Aliases { get; }
+
         object Return { get; }
 
         void Goto(string label);

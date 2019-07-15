@@ -36,7 +36,11 @@ namespace GalaScript
             PrepareOperations();
         }
 
+        public bool Paused { get; set; }
+
         public IParser Parser { get; set; }
+
+        public IScriptEvaluator Current { get; set; }
 
         public void Register(string name, Delegate func)
         {
@@ -162,18 +166,16 @@ namespace GalaScript
             _script.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
         }
 
-        public object Evaluate()
+        public object Run()
         {
-            _script?.Reset();
-
             return _script?.Evaluate();
         }
 
-        public object Evaluate(string str, Encoding encoding = null)
+        public object Run(string str, Encoding encoding = null)
         {
             Prepare(str, encoding);
 
-            return Evaluate();
+            return Run();
         }
     }
 }

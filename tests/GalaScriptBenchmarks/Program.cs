@@ -32,42 +32,21 @@ namespace GalaScriptBenchmarks
         }
 
         [Benchmark]
-        public object RunSingleLineNative()
+        public void RunSingleLineNative()
         {
-            var result = Add(2.0m, 0.0m);
-
-            if (result is decimal ret && ret != 2.0m)
-            {
-                throw new Exception();
-            }
-
-            return result;
+            Add(2.0m, 0.0m);
         }
 
         [Benchmark]
-        public object RunSingleLineDirectly()
+        public void RunSingleLineDirectly()
         {
-            var result = _exp.Evaluate();
-
-            if (result is decimal ret && ret != 2.0m)
-            {
-                throw new Exception();
-            }
-
-            return result;
+            _exp.Evaluate();
         }
 
         [Benchmark]
-        public object RunSingleLineByScriptEvaluator()
+        public void RunSingleLineByScriptEvaluator()
         {
-            var result = _engine.Evaluate();
-
-            if (result is decimal ret && ret != 2.0m)
-            {
-                throw new Exception();
-            }
-
-            return result;
+            _engine.Run();
         }
     }
 
@@ -116,9 +95,9 @@ namespace GalaScriptBenchmarks
         }
 
         [Benchmark]
-        public object RunBlockByScriptEvaluator()
+        public void RunBlockByScriptEvaluator()
         {
-            return _engine.Evaluate();
+            _engine.Run();
         }
     }
 

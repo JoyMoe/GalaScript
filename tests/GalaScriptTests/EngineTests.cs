@@ -26,76 +26,76 @@ namespace GalaScriptTests
         [Test, Order(1)]
         public void TestFunction()
         {
-            Assert.AreEqual("hello", _engine.Evaluate("[echo \"hello\"]"));
-            Assert.AreEqual("world", _engine.Evaluate("[echo \"world\"]"));
-            Assert.AreEqual("hello world", _engine.Evaluate("[echo \"hello\" \" \" \"world\"]"));
-            Assert.AreEqual("hello world", _engine.Evaluate("[echo \"hello world\"]"));
+            Assert.AreEqual("hello", _engine.Run("[echo \"hello\"]"));
+            Assert.AreEqual("world", _engine.Run("[echo \"world\"]"));
+            Assert.AreEqual("hello world", _engine.Run("[echo \"hello\" \" \" \"world\"]"));
+            Assert.AreEqual("hello world", _engine.Run("[echo \"hello world\"]"));
 
-            Assert.AreEqual(2.0, _engine.Evaluate("[add 2 0]"));
-            Assert.AreEqual(4.0, _engine.Evaluate("[add 2 2]"));
-            Assert.AreEqual(1.0, _engine.Evaluate("[add 2 -1]"));
-            Assert.AreEqual(6.0, _engine.Evaluate("[add 2 2 2]"));
+            Assert.AreEqual(2.0, _engine.Run("[add 2 0]"));
+            Assert.AreEqual(4.0, _engine.Run("[add 2 2]"));
+            Assert.AreEqual(1.0, _engine.Run("[add 2 -1]"));
+            Assert.AreEqual(6.0, _engine.Run("[add 2 2 2]"));
         }
 
         [Test, Order(2)]
         public void TestReturn()
         {
-            Assert.AreEqual(8.0, _engine.Evaluate("[add ret 2]"));
+            Assert.AreEqual(8.0, _engine.Run("[add ret 2]"));
         }
 
         [Test, Order(3)]
         public void TestPushPeekPopEax()
         {
-            Assert.AreEqual(8.0, _engine.Evaluate("[peek eax]"));
-            Assert.AreEqual(8.0, _engine.Evaluate("[pop eax]"));
-            Assert.AreEqual(8.0, _engine.Evaluate("[push eax]"));
-            Assert.AreEqual(8.0, _engine.Evaluate("[pop eax]"));
+            Assert.AreEqual(8.0, _engine.Run("[peek eax]"));
+            Assert.AreEqual(8.0, _engine.Run("[pop eax]"));
+            Assert.AreEqual(8.0, _engine.Run("[push eax]"));
+            Assert.AreEqual(8.0, _engine.Run("[pop eax]"));
 
-            Assert.AreEqual(6.0, _engine.Evaluate("[pop eax]"));
-            Assert.AreEqual(1.0, _engine.Evaluate("[pop eax]"));
-            Assert.AreEqual(4.0, _engine.Evaluate("[pop eax]"));
-            Assert.AreEqual(2.0, _engine.Evaluate("[pop eax]"));
+            Assert.AreEqual(6.0, _engine.Run("[pop eax]"));
+            Assert.AreEqual(1.0, _engine.Run("[pop eax]"));
+            Assert.AreEqual(4.0, _engine.Run("[pop eax]"));
+            Assert.AreEqual(2.0, _engine.Run("[pop eax]"));
 
             for (var i = 0; i < 4; i++)
             {
-                _engine.Evaluate("[pop eax]");
+                _engine.Run("[pop eax]");
             }
 
-            Assert.Catch<InvalidOperationException>(() => _engine.Evaluate("[peek eax]"));
-            Assert.Catch<InvalidOperationException>(() => _engine.Evaluate("[pop eax]"));
+            Assert.Catch<InvalidOperationException>(() => _engine.Run("[peek eax]"));
+            Assert.Catch<InvalidOperationException>(() => _engine.Run("[pop eax]"));
         }
 
         [Test, Order(4)]
         public void TestPushPeekPopEbx()
         {
-            Assert.AreEqual(2.0, _engine.Evaluate("[add 2 0]"));
+            Assert.AreEqual(2.0, _engine.Run("[add 2 0]"));
 
             for (var i = 0; i < 11; i++)
             {
-                Assert.AreEqual(2.0, _engine.Evaluate("[push ebx]"));
+                Assert.AreEqual(2.0, _engine.Run("[push ebx]"));
             }
 
-            Assert.AreEqual(2.0, _engine.Evaluate("[peek ebx]"));
+            Assert.AreEqual(2.0, _engine.Run("[peek ebx]"));
 
             for (var i = 0; i < 10; i++)
             {
-                Assert.AreEqual(2.0, _engine.Evaluate("[pop ebx]"));
+                Assert.AreEqual(2.0, _engine.Run("[pop ebx]"));
             }
 
-            Assert.Catch<InvalidOperationException>(() => _engine.Evaluate("[peek ebx]"));
-            Assert.Catch<InvalidOperationException>(() => _engine.Evaluate("[pop ebx]"));
+            Assert.Catch<InvalidOperationException>(() => _engine.Run("[peek ebx]"));
+            Assert.Catch<InvalidOperationException>(() => _engine.Run("[pop ebx]"));
 
-            Assert.Catch<ArgumentException>(() => _engine.Evaluate("[push 1]"));
-            Assert.Catch<ArgumentException>(() => _engine.Evaluate("[peek 1]"));
-            Assert.Catch<ArgumentException>(() => _engine.Evaluate("[pop 1]"));
+            Assert.Catch<ArgumentException>(() => _engine.Run("[push 1]"));
+            Assert.Catch<ArgumentException>(() => _engine.Run("[peek 1]"));
+            Assert.Catch<ArgumentException>(() => _engine.Run("[pop 1]"));
         }
 
         [Test, Order(5)]
         public void TestAlias()
         {
-            Assert.AreEqual(2.0, _engine.Evaluate("[add 2 0] : $foo"));
-            Assert.AreEqual(4.0, _engine.Evaluate("[add 2 2]:$bar"));
-            Assert.AreEqual(6.0, _engine.Evaluate("[add $foo $bar]"));
+            Assert.AreEqual(2.0, _engine.Run("[add 2 0] : $foo"));
+            Assert.AreEqual(4.0, _engine.Run("[add 2 2]:$bar"));
+            Assert.AreEqual(6.0, _engine.Run("[add $foo $bar]"));
         }
 
         [Test, Order(6)]
@@ -103,7 +103,7 @@ namespace GalaScriptTests
         {
             _engine.Prepare("[add 2 2]");
 
-            Assert.AreEqual(4.0, _engine.Evaluate());
+            Assert.AreEqual(4.0, _engine.Run());
         }
 
         [Test, Order(7)]
@@ -118,7 +118,7 @@ namespace GalaScriptTests
 [foo 2 2 2]
 ");
 
-            Assert.AreEqual(6.0, _engine.Evaluate());
+            Assert.AreEqual(6.0, _engine.Run());
 
             _engine.Prepare(@"
 !bar
@@ -129,7 +129,7 @@ namespace GalaScriptTests
 [bar]
 ");
 
-            Assert.AreEqual(6.0, _engine.Evaluate());
+            Assert.AreEqual(6.0, _engine.Run());
         }
 
         [Test, Order(7)]
@@ -137,9 +137,9 @@ namespace GalaScriptTests
         {
             _engine.Prepare("test.gs");
 
-            Assert.AreEqual(6.0, _engine.Evaluate());
+            Assert.AreEqual(6.0, _engine.Run());
 
-            Assert.Catch<ArgumentException>(() => _engine.Evaluate("[goto *none]"));
+            Assert.Catch<ArgumentException>(() => _engine.Run("[goto *none]"));
         }
     }
 }

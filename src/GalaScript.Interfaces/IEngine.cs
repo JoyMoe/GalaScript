@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace GalaScript.Interfaces
 {
     public interface IEngine
     {
+        bool Paused { get; set; }
+
         IParser Parser { get; set; }
+
+        IScriptEvaluator Current { get; set; }
 
         void Register(string name, Delegate func);
 
@@ -18,8 +21,8 @@ namespace GalaScript.Interfaces
 
         void Prepare(string str, Encoding encoding = null);
 
-        object Evaluate();
+        object Run();
 
-        object Evaluate(string str, Encoding encoding = null);
+        object Run(string str, Encoding encoding = null);
     }
 }
