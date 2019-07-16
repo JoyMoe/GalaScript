@@ -12,7 +12,6 @@ namespace GalaScript
 {
     public class ScriptEngine : IEngine
     {
-
         private readonly Dictionary<string, Func<IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IScriptEvaluator, object[], object>>();
 
         private IScriptEvaluator _script;
@@ -29,12 +28,16 @@ namespace GalaScript
                 this.Register(method.Name.ToLower(), method);
         }
 
-        public ScriptEngine()
+        public ScriptEngine(bool debug = false)
         {
+            Debug = debug;
+
             Parser = new ExpressionParser(this);
 
             PrepareOperations();
         }
+
+        public bool Debug { get; }
 
         public bool Paused { get; set; }
 

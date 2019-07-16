@@ -12,8 +12,10 @@ namespace GalaScript.Evaluators
     {
         protected readonly IEngine Engine;
 
-        protected readonly Dictionary<long, IEvaluator> Script = new Dictionary<long, IEvaluator>();
-        protected readonly Dictionary<string, long> Labels = new Dictionary<string, long>();
+        private LinkedListNode<IEvaluator> _currentNode;
+        protected readonly LinkedList<IEvaluator> Script = new LinkedList<IEvaluator>();
+        protected readonly Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>> Labels =
+            new Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>>();
 
         private IDropOutStack<object> _eax = new DropOutStack<object>(10);
         private IDropOutStack<object> _ebx = new DropOutStack<object>(10);
@@ -30,11 +32,15 @@ namespace GalaScript.Evaluators
 
             foreach (var exp in evaluators)
             {
-                if (exp == null) continue;
+                if (Engine.Debug == false && exp == null) continue;
 
-                exp.SetCaller(this);
+                exp?.SetCaller(this);
 
-                switch (exp)
+                Script.AddLast(exp);
+
+                CurrentLineNumber++;
+
+                switch (Script.Last.Value)
                 {
                     case MacroEvaluator macro:
                         macro.ReplaceEnvironment(_aliases);
@@ -47,7 +53,7 @@ namespace GalaScript.Evaluators
                             return macro.Evaluate();
                         }
 
-                        engine.Register(macro.Name, (Func<object[], object>) Macro);
+                        Engine.Register(macro.Name, (Func<object[], object>) Macro);
 
                         break;
                     case ScriptEvaluator sub:
@@ -55,13 +61,10 @@ namespace GalaScript.Evaluators
                         sub.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
                         break;
                     case LabelEvaluator label:
-                        Labels[label.Name] = CurrentLineNumber;
+                        Labels[label.Name] =
+                            new KeyValuePair<long, LinkedListNode<IEvaluator>>(CurrentLineNumber, Script.Last);
                         break;
                 }
-
-                Script[CurrentLineNumber] = exp;
-
-                CurrentLineNumber++;
             }
 
             Reset();
@@ -74,7 +77,7 @@ namespace GalaScript.Evaluators
 
         public long CurrentLineNumber { get; protected set; }
 
-        public IEvaluator Current => Script[CurrentLineNumber];
+        public IEvaluator Current => _currentNode?.Value;
 
         public IDropOutStack<object> Eax => _eax;
 
@@ -86,9 +89,10 @@ namespace GalaScript.Evaluators
 
         public void Goto(string label)
         {
-            if (Labels.TryGetValue(label, out var no))
+            if (Labels.TryGetValue(label, out var kv))
             {
-                CurrentLineNumber = no;
+                CurrentLineNumber = kv.Key;
+                _currentNode = kv.Value;
             }
             else
             {
@@ -101,16 +105,33 @@ namespace GalaScript.Evaluators
             switch (origin)
             {
                 case SeekOrigin.Begin:
+                    _currentNode = Script.First;
                     CurrentLineNumber = offset;
                     break;
                 case SeekOrigin.Current:
                     CurrentLineNumber += offset;
                     break;
                 case SeekOrigin.End:
-                    CurrentLineNumber = Script.Count + offset - 1;
+                    _currentNode = Script.Last;
+                    CurrentLineNumber = Script.Count + offset;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
+            }
+
+            if (offset > 0)
+            {
+                for (var i = 0; i < offset; i++)
+                {
+                    _currentNode = _currentNode?.Next;
+                }
+            }
+            else
+            {
+                for (var i = 0; i > offset; i--)
+                {
+                    _currentNode = _currentNode?.Previous;
+                }
             }
         }
 
@@ -128,11 +149,9 @@ namespace GalaScript.Evaluators
 
         public object StepOut()
         {
-            var current = Script[CurrentLineNumber];
-
-            if (current != null && current is MacroEvaluator == false)
+            if (Current != null && Current is MacroEvaluator == false)
             {
-                current.Evaluate();
+                Current.Evaluate();
             }
 
             Seek(1, SeekOrigin.Current);
@@ -142,11 +161,11 @@ namespace GalaScript.Evaluators
 
         public object Evaluate()
         {
-            while (CurrentLineNumber < Script.Count)
+            while (_currentNode != null)
             {
                 Engine.Current = this;
 
-                while (Engine.Paused)
+                while (Engine.Debug && Engine.Paused)
                 {
                     Thread.Sleep(5);
                 }

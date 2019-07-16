@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
@@ -16,23 +17,24 @@ namespace GalaScript.Evaluators
 
             foreach (var exp in evaluators)
             {
-                if (exp == null) continue;
+                if (Engine.Debug == false && exp == null) continue;
 
-                exp.SetCaller(this);
+                exp?.SetCaller(this);
 
-                switch (exp)
+                Script.AddLast(exp);
+
+                CurrentLineNumber++;
+
+                switch (Script.Last.Value)
                 {
                     case MacroEvaluator _:
                     case ScriptEvaluator _:
                         throw new NotSupportedException("Nested Macro is not supported.");
                     case LabelEvaluator label:
-                        Labels[label.Name] = CurrentLineNumber;
+                        Labels[label.Name] =
+                            new KeyValuePair<long, LinkedListNode<IEvaluator>>(CurrentLineNumber, Script.Last);
                         break;
                 }
-
-                Script[CurrentLineNumber] = exp;
-
-                CurrentLineNumber++;
             }
 
             Reset();

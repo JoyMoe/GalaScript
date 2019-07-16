@@ -5,6 +5,8 @@ namespace GalaScript.Interfaces
 {
     public interface IEngine
     {
+        bool Debug { get; }
+
         bool Paused { get; set; }
 
         IParser Parser { get; set; }

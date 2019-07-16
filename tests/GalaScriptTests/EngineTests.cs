@@ -18,7 +18,7 @@ namespace GalaScriptTests
 
         public EngineTests()
         {
-            _engine = new ScriptEngine();
+            _engine = new ScriptEngine(true);
             _engine.Register("add", (Func<decimal[], decimal>)Add);
             _engine.Register("echo", (Func<string[], string>)Echo);
         }
@@ -138,6 +138,8 @@ namespace GalaScriptTests
             _engine.Prepare("test.gs");
 
             Assert.AreEqual(6.0, _engine.Run());
+
+            Assert.AreEqual(25, _engine.Current.CurrentLineNumber);
 
             Assert.Catch<ArgumentException>(() => _engine.Run("[goto *none]"));
         }
