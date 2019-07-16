@@ -133,9 +133,17 @@ namespace GalaScriptTests
         }
 
         [Test, Order(7)]
+        public void TestImport()
+        {
+            _engine.Prepare("misc/foo.gs");
+
+            Assert.AreEqual(6.0, _engine.Run());
+        }
+
+        [Test, Order(8)]
         public void TestGotoGoif()
         {
-            _engine.Prepare("test.gs");
+            _engine.Prepare("misc/test.gs");
 
             Assert.AreEqual(6.0, _engine.Run());
 

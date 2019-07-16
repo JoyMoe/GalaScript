@@ -161,7 +161,7 @@ result = ""hello""
         [Test]
         public void TestScript()
         {
-            var exps = _parser.Prepare(File.ReadAllText("test.gs"));
+            var exps = _parser.Prepare(File.ReadAllText("misc/test.gs"));
 
             Assert.AreEqual(24, exps.Count());
         }

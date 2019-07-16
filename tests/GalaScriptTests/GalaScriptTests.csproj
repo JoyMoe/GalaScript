@@ -23,8 +23,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\misc\bar.gs">
+      <Link>misc\bar.gs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\misc\foo.gs">
+      <Link>misc\foo.gs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="..\..\misc\test.gs">
-      <Link>test.gs</Link>
+      <Link>misc\test.gs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,8 @@ namespace GalaScript
     public class ExpressionParser : IParser
     {
         private readonly IEngine _engine;
+
+        private string path;
 
         #region grammars
 
@@ -83,6 +86,8 @@ namespace GalaScript
 
         private readonly Parser<IEvaluator> Macro;
 
+        private readonly Parser<IEvaluator> Import;
+
         private Parser<IEvaluator> Evaluator;
 
         // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
@@ -132,7 +137,13 @@ namespace GalaScript
                 from ending in Parse.Char('!')
                 select new MacroEvaluator(_engine, name, parameters.GetOrDefault()?.ToArray(), str);
 
-            Evaluator = Macro.Or(Label).Or(Text).Or(Alias).Or(Function);
+            Import =
+                from op in Parse.Char('%')
+                from space in Space.Optional()
+                from file in Parse.AnyChar.Except(Parse.LineTerminator).Many().Text()
+                select new ScriptEvaluator(_engine, File.ReadAllText(Path.Combine(path, file)));
+
+            Evaluator = Import.Or(Macro).Or(Label).Or(Text).Or(Alias).Or(Function);
         }
 
         public void RegisterEvaluator(Parser<IEvaluator> parser)
@@ -156,6 +167,8 @@ namespace GalaScript
 
         public IScriptEvaluator LoadString(string str)
         {
+            path = Path.GetDirectoryName(Environment.CurrentDirectory);
+
             return new ScriptEvaluator(_engine, str);
         }
 
@@ -165,6 +178,8 @@ namespace GalaScript
             {
                 encoding = Encoding.Default;
             }
+
+            path = Path.GetDirectoryName(Path.GetFullPath(file));
 
             var str = File.ReadAllText(file, encoding);
 
