@@ -4,19 +4,19 @@ namespace GalaScript.Internal
 {
     internal static class EngineOperations
     {
-        public static void Push(IScriptEvaluator script, string reg)
+        public static void Push(IScriptEvaluator script)
         {
-            script.Push(reg);
+            script.Push();
         }
 
-        public static object Peek(IScriptEvaluator script, string reg)
+        public static object Peek(IScriptEvaluator script)
         {
-            return script.Peek(reg);
+            return script.Peek();
         }
 
-        public static object Pop(IScriptEvaluator script, string reg)
+        public static object Pop(IScriptEvaluator script)
         {
-            return script.Pop(reg);
+            return script.Pop();
         }
 
         public static void Goto(IScriptEvaluator script, string label)

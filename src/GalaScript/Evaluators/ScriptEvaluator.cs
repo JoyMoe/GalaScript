@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using GalaScript.Interfaces;
-using GalaScript.Internal;
 
 namespace GalaScript.Evaluators
 {
@@ -17,8 +16,7 @@ namespace GalaScript.Evaluators
         protected readonly Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>> Labels =
             new Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>>();
 
-        private IDropOutStack<object> _eax = new DropOutStack<object>(10);
-        private IDropOutStack<object> _ebx = new DropOutStack<object>(10);
+        private Stack<object> _stack = new Stack<object>(10);
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
         protected ScriptEvaluator(IEngine engine)
@@ -58,7 +56,7 @@ namespace GalaScript.Evaluators
                         break;
                     case ScriptEvaluator sub:
                         // TODO: add option to config ReplaceEnvironment in sub-script
-                        sub.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
+                        sub.ReplaceEnvironment(ref _stack, ref _aliases);
                         break;
                     case LabelEvaluator label:
                         Labels[label.Name] =
@@ -79,9 +77,7 @@ namespace GalaScript.Evaluators
 
         public IEvaluator Current => _currentNode?.Value;
 
-        public IDropOutStack<object> Eax => _eax;
-
-        public IDropOutStack<object> Ebx => _ebx;
+        public Stack<object> Stack => _stack;
 
         public Dictionary<string, object> Aliases => _aliases;
 
@@ -189,11 +185,9 @@ namespace GalaScript.Evaluators
             _aliases = aliases;
         }
 
-        public void ReplaceEnvironment(ref IDropOutStack<object> eax, ref IDropOutStack<object> ebx,
-            ref Dictionary<string, object> aliases)
+        public void ReplaceEnvironment(ref Stack<object> stack, ref Dictionary<string, object> aliases)
         {
-            _eax = eax;
-            _ebx = ebx;
+            _stack = stack;
             _aliases = aliases;
         }
 
@@ -207,45 +201,19 @@ namespace GalaScript.Evaluators
             return _aliases.ContainsKey(name) ? _aliases[name] : null;
         }
 
-        public void Push(string reg)
+        public void Push()
         {
-            switch (reg)
-            {
-                case "eax":
-                    _eax.Push(Return);
-                    break;
-                case "ebx":
-                    _ebx.Push(Return);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(reg));
-            }
+            _stack.Push(Return);
         }
 
-        public object Peek(string reg)
+        public object Peek()
         {
-            switch (reg)
-            {
-                case "eax":
-                    return _eax.Peek();
-                case "ebx":
-                    return _ebx.Peek();
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(reg));
-            }
+            return _stack.Peek();
         }
 
-        public object Pop(string reg)
+        public object Pop()
         {
-            switch (reg)
-            {
-                case "eax":
-                    return _eax.Pop();
-                case "ebx":
-                    return _ebx.Pop();
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(reg));
-            }
+            return _stack.Pop();
         }
     }
 }

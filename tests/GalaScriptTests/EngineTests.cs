@@ -44,50 +44,15 @@ namespace GalaScriptTests
         }
 
         [Test, Order(3)]
-        public void TestPushPeekPopEax()
+        public void TestPushPeekPop()
         {
-            Assert.AreEqual(8.0, _engine.Run("[peek eax]"));
-            Assert.AreEqual(8.0, _engine.Run("[pop eax]"));
-            Assert.AreEqual(8.0, _engine.Run("[push eax]"));
-            Assert.AreEqual(8.0, _engine.Run("[pop eax]"));
+            Assert.AreEqual(8.0, _engine.Run("[push]"));
 
-            Assert.AreEqual(6.0, _engine.Run("[pop eax]"));
-            Assert.AreEqual(1.0, _engine.Run("[pop eax]"));
-            Assert.AreEqual(4.0, _engine.Run("[pop eax]"));
-            Assert.AreEqual(2.0, _engine.Run("[pop eax]"));
+            Assert.AreEqual(8.0, _engine.Run("[peek]"));
+            Assert.AreEqual(8.0, _engine.Run("[pop]"));
 
-            for (var i = 0; i < 4; i++)
-            {
-                _engine.Run("[pop eax]");
-            }
-
-            Assert.Catch<InvalidOperationException>(() => _engine.Run("[peek eax]"));
-            Assert.Catch<InvalidOperationException>(() => _engine.Run("[pop eax]"));
-        }
-
-        [Test, Order(4)]
-        public void TestPushPeekPopEbx()
-        {
-            Assert.AreEqual(2.0, _engine.Run("[add 2 0]"));
-
-            for (var i = 0; i < 11; i++)
-            {
-                Assert.AreEqual(2.0, _engine.Run("[push ebx]"));
-            }
-
-            Assert.AreEqual(2.0, _engine.Run("[peek ebx]"));
-
-            for (var i = 0; i < 10; i++)
-            {
-                Assert.AreEqual(2.0, _engine.Run("[pop ebx]"));
-            }
-
-            Assert.Catch<InvalidOperationException>(() => _engine.Run("[peek ebx]"));
-            Assert.Catch<InvalidOperationException>(() => _engine.Run("[pop ebx]"));
-
-            Assert.Catch<ArgumentException>(() => _engine.Run("[push 1]"));
-            Assert.Catch<ArgumentException>(() => _engine.Run("[peek 1]"));
-            Assert.Catch<ArgumentException>(() => _engine.Run("[pop 1]"));
+            Assert.Catch<InvalidOperationException>(() => _engine.Run("[peek]"));
+            Assert.Catch<InvalidOperationException>(() => _engine.Run("[pop]"));
         }
 
         [Test, Order(5)]

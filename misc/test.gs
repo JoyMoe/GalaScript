@@ -1,7 +1,7 @@
 
 *label1
 [add 1 1]:$va
-[pop ebx]
+[pop]
 [goto *label3]
 
 * label2
@@ -14,7 +14,7 @@
 - GalaScript
 + Test
 [add 2 2]
-[push ebx]
+[push]
 [goto *label1]
 
 * label3

@@ -16,8 +16,7 @@ namespace GalaScript
 
         private IScriptEvaluator _script;
 
-        private IDropOutStack<object> _eax = new DropOutStack<object>(10);
-        private IDropOutStack<object> _ebx = new DropOutStack<object>(10);
+        private Stack<object> _stack = new Stack<object>();
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
         private static readonly object Void = new object();
@@ -142,11 +141,6 @@ namespace GalaScript
 
             caller.SetAlias("ret", result);
 
-            if (name != "push" && name != "peek" && name != "pop" && name != "goto" && name != "goif")
-            {
-                EngineOperations.Push(caller, "eax");
-            }
-
             return result;
         }
 
@@ -166,11 +160,14 @@ namespace GalaScript
                 ? Parser.LoadFile(str, encoding)
                 : Parser.LoadString(str);
 
-            _script.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
+            _script.ReplaceEnvironment(ref _stack, ref _aliases);
         }
 
         public void Reset()
         {
+            _stack.Clear();
+            _aliases.Clear();
+
             Current = null;
             Paused = false;
 

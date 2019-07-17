@@ -9,9 +9,7 @@ namespace GalaScript.Interfaces
 
         IEvaluator Current { get; }
 
-        IDropOutStack<object> Eax { get; }
-
-        IDropOutStack<object> Ebx { get; }
+        Stack<object> Stack { get; }
 
         Dictionary<string, object> Aliases { get; }
 
@@ -29,17 +27,16 @@ namespace GalaScript.Interfaces
 
         void ReplaceEnvironment(ref Dictionary<string, object> aliases);
 
-        void ReplaceEnvironment(ref IDropOutStack<object> eax, ref IDropOutStack<object> ebx,
-            ref Dictionary<string, object> aliases);
+        void ReplaceEnvironment(ref Stack<object> stack, ref Dictionary<string, object> aliases);
 
         void SetAlias(string name, object value);
 
         object GetAlias(string name);
 
-        void Push(string reg);
+        void Push();
 
-        object Peek(string reg);
+        object Peek();
 
-        object Pop(string reg);
+        object Pop();
     }
 }
