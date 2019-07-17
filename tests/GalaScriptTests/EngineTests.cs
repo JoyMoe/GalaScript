@@ -78,23 +78,24 @@ namespace GalaScriptTests
 !foo [$a $b $c]
     [add $a $b]
     [add ret $c]
+    [add ret $bar]
 !
 
 [foo 2 2 2]
 ");
 
-            Assert.AreEqual(6.0, _engine.Run());
+            Assert.AreEqual(10.0, _engine.Run());
 
             _engine.Prepare(@"
 !bar
-    [add 2 2]
+    [add $bar 2]
     [add ret 2]
 !
 
 [bar]
 ");
 
-            Assert.AreEqual(6.0, _engine.Run());
+            Assert.AreEqual(8.0, _engine.Run());
         }
 
         [Test, Order(7)]
