@@ -3,11 +3,15 @@ using System.Text;
 
 namespace GalaScript.Interfaces
 {
+    public delegate void PausedEventHandler();
+
     public interface IEngine
     {
         bool Debug { get; }
 
         bool Paused { get; set; }
+
+        event PausedEventHandler OnPausedHandler;
 
         IParser Parser { get; set; }
 

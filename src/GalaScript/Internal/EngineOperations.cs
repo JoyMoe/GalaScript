@@ -4,6 +4,11 @@ namespace GalaScript.Internal
 {
     internal static class EngineOperations
     {
+        public static void Halt(IEngine engine)
+        {
+            engine.Paused = true;
+        }
+
         public static void Push(IScriptEvaluator script)
         {
             script.Push();

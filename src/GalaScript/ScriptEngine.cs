@@ -12,7 +12,9 @@ namespace GalaScript
 {
     public class ScriptEngine : IEngine
     {
-        private readonly Dictionary<string, Func<IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IScriptEvaluator, object[], object>>();
+        private readonly Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>>();
+
+        private bool _paused;
 
         private IScriptEvaluator _script;
 
@@ -38,7 +40,17 @@ namespace GalaScript
 
         public bool Debug { get; }
 
-        public bool Paused { get; set; }
+        public bool Paused
+        {
+            get => _paused;
+            set
+            {
+                _paused = value;
+                OnPausedHandler?.Invoke();
+            }
+        }
+
+        public event PausedEventHandler OnPausedHandler;
 
         public IParser Parser { get; set; }
 
@@ -48,6 +60,7 @@ namespace GalaScript
         {
             var funcParameters = func.Method.GetParameters();
 
+            var engineExpr = Expression.Parameter(typeof(IEngine), "engine");
             var callerExpr = Expression.Parameter(typeof(IScriptEvaluator), "caller");
             var paraExpr = Expression.Parameter(typeof(object[]), "obj");
             var callExpr = new List<Expression>(funcParameters.Length);
@@ -64,6 +77,10 @@ namespace GalaScript
                     var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex++)), Expression.Constant(pType));
                     // ReSharper restore AssignNullToNotNullAttribute
                     callExpr.Add(Expression.Convert(convert, pType));
+                }
+                else if (pType == typeof(IEngine))
+                {
+                    callExpr.Add(engineExpr);
                 }
                 else if (pType == typeof(IScriptEvaluator))
                 {
@@ -105,21 +122,21 @@ namespace GalaScript
 
             var isAction = func.Method.ReturnType == typeof(void);
 
-            Func<IScriptEvaluator, object[], object> fun;
+            Func<IEngine, IScriptEvaluator, object[], object> fun;
             if(isAction)
             {
-                var actionCaller = Expression.Lambda<Action<IScriptEvaluator, object[]>>(body, callerExpr, paraExpr).Compile();
-                fun = (caller, obj) =>
+                var actionCaller = Expression.Lambda<Action<IEngine, IScriptEvaluator, object[]>>(body, engineExpr, callerExpr, paraExpr).Compile();
+                fun = (engine, caller, obj) =>
                 {
-                    actionCaller(caller, obj);
+                    actionCaller(engine, caller, obj);
                     return Void;
                 };
             }
             else
             {
                 var boxed = Expression.Convert(body, typeof(object));
-                var funcCaller = Expression.Lambda<Func<IScriptEvaluator, object[], object>>(boxed, callerExpr, paraExpr).Compile();
-                fun = (caller, obj) => funcCaller(caller, obj);
+                var funcCaller = Expression.Lambda<Func<IEngine, IScriptEvaluator, object[], object>>(boxed, engineExpr,callerExpr, paraExpr).Compile();
+                fun = (engine, caller, obj) => funcCaller(engine, caller, obj);
             }
 
             _functions[name] = fun;
@@ -132,7 +149,7 @@ namespace GalaScript
                 caller = _script;
             }
 
-            var result = _functions[name](caller, arguments);
+            var result = _functions[name](this, caller, arguments);
 
             if (result == Void)
             {
