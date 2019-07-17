@@ -41,11 +41,11 @@ namespace GalaScript.Evaluators
                 switch (Script.Last.Value)
                 {
                     case MacroEvaluator macro:
-                        macro.ReplaceEnvironment(_aliases);
-
                         object Macro(object[] objects)
                         {
                             macro.SetCaller(objects.FirstOrDefault() as IScriptEvaluator);
+
+                            macro.ReplaceEnvironment(_aliases);
                             macro.SetArguments(objects.ToArray());
 
                             return macro.Evaluate();
