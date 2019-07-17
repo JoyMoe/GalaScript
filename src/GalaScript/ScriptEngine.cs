@@ -19,6 +19,7 @@ namespace GalaScript
         private IScriptEvaluator _script;
 
         private Stack<object> _stack = new Stack<object>();
+
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
         private static readonly object Void = new object();
@@ -46,11 +47,25 @@ namespace GalaScript
             set
             {
                 _paused = value;
-                OnPausedHandler?.Invoke();
+
+                if (_paused)
+                {
+                    OnPausedHandler?.Invoke();
+                }
+                else
+                {
+                    OnResumedHandler?.Invoke();
+                }
             }
         }
 
-        public event PausedEventHandler OnPausedHandler;
+        public event EngineEventHandler OnStartedHandler;
+
+        public event EngineEventHandler OnPausedHandler;
+
+        public event EngineEventHandler OnResumedHandler;
+
+        public event EngineEventHandler OnExitedHandler;
 
         public IParser Parser { get; set; }
 
@@ -193,7 +208,13 @@ namespace GalaScript
 
         public object Run()
         {
-            return _script?.Evaluate();
+            OnStartedHandler?.Invoke();
+
+            var result = _script?.Evaluate();
+
+            OnExitedHandler?.Invoke();
+
+            return result;
         }
 
         public object Run(string str, Encoding encoding = null)

@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalaScriptBenchmarks", "tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalaScript.Interfaces", "src\GalaScript.Interfaces\GalaScript.Interfaces.csproj", "{7AA3B532-4D38-4785-A302-3C59F71B7308}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalaToaster", "samples\GalaToaster\GalaToaster.csproj", "{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7AA3B532-4D38-4785-A302-3C59F71B7308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AA3B532-4D38-4785-A302-3C59F71B7308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AA3B532-4D38-4785-A302-3C59F71B7308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{5AF42B50-EC90-4E54-B492-32780F69D2B5} = {A7ADCAD4-034E-445F-98C1-9B8CE461BEF4}
 		{D25A3EAA-34D1-48E8-872A-54F38112793D} = {A7ADCAD4-034E-445F-98C1-9B8CE461BEF4}
 		{7AA3B532-4D38-4785-A302-3C59F71B7308} = {4CF68E01-84DB-4DF2-B974-8AA4A8304B69}
+		{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB} = {03CC9288-6E51-4308-9A2F-65ACF54ED5BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		        SolutionGuid = {1B529142-11E3-4533-9613-E3CE3D644510}

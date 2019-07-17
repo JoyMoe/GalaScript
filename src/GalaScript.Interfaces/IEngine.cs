@@ -3,7 +3,7 @@ using System.Text;
 
 namespace GalaScript.Interfaces
 {
-    public delegate void PausedEventHandler();
+    public delegate void EngineEventHandler();
 
     public interface IEngine
     {
@@ -11,7 +11,13 @@ namespace GalaScript.Interfaces
 
         bool Paused { get; set; }
 
-        event PausedEventHandler OnPausedHandler;
+        event EngineEventHandler OnStartedHandler;
+
+        event EngineEventHandler OnPausedHandler;
+
+        event EngineEventHandler OnResumedHandler;
+
+        event EngineEventHandler OnExitedHandler;
 
         IParser Parser { get; set; }
 
