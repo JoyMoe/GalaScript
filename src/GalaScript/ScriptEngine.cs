@@ -169,6 +169,14 @@ namespace GalaScript
             _script.ReplaceEnvironment(ref _eax, ref _ebx, ref _aliases);
         }
 
+        public void Reset()
+        {
+            Current = null;
+            Paused = false;
+
+            _script?.Reset();
+        }
+
         public object Run()
         {
             return _script?.Evaluate();

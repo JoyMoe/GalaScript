@@ -47,6 +47,7 @@ namespace GalaScriptBenchmarks
         public void RunSingleLineByScriptEvaluator()
         {
             _engine.Run();
+            _engine.Reset();
         }
     }
 
@@ -59,45 +60,20 @@ namespace GalaScriptBenchmarks
         private static decimal Add(params decimal[] arguments) =>
             arguments.Aggregate(0.0m, (acc, argument) => acc + argument);
 
-        private const string Script = @"
-*label1
-[add 1 1]:$va
-[pop ebx]
-[goto *label3]
-
-* label2
-[add ret 2]
-[goto *end]
-
-*start # start is a special label
-# start here
-- Hello World
-- GalaScript
-+ Test
-[add 2 2]
-[push ebx]
-[goto *label1]
-
-* label3
-[add $va 2]
-[goif *label2]
-
-*end
-";
-
         public Block()
         {
             _engine = new ScriptEngine();
 
             _engine.Register("add", (Func<decimal[], decimal>) Add);
 
-            _engine.Prepare(Script);
+            _engine.Prepare("test.gs");
         }
 
         [Benchmark]
         public void RunBlockByScriptEvaluator()
         {
             _engine.Run();
+            _engine.Reset();
         }
     }
 

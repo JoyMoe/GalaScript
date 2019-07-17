@@ -23,6 +23,8 @@ namespace GalaScript.Interfaces
 
         void Prepare(string str, Encoding encoding = null);
 
+        void Reset();
+
         object Run();
 
         object Run(string str, Encoding encoding = null);
