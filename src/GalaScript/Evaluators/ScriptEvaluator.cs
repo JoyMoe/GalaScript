@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 
 namespace GalaScript.Evaluators
 {
     public class ScriptEvaluator : IScriptEvaluator
     {
-        protected readonly IEngine Engine;
+        protected readonly ScriptEngine Engine;
 
         private LinkedListNode<IEvaluator> _currentNode;
         protected readonly LinkedList<IEvaluator> Script = new LinkedList<IEvaluator>();
@@ -19,18 +19,18 @@ namespace GalaScript.Evaluators
         private Stack<object> _stack = new Stack<object>(10);
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
-        protected ScriptEvaluator(IEngine engine)
+        protected ScriptEvaluator(ScriptEngine engine)
         {
             Engine = engine;
         }
 
-        public ScriptEvaluator(IEngine engine, string str) : this(engine)
+        public ScriptEvaluator(ScriptEngine engine, string str) : this(engine)
         {
             var evaluators = Engine.Parser.Prepare(str);
 
             foreach (var exp in evaluators)
             {
-                if (Engine.Debug == false && exp == null) continue;
+                if (Engine.IsDebugAllowed == false && exp == null) continue;
 
                 exp?.SetCaller(this);
 
@@ -143,30 +143,33 @@ namespace GalaScript.Evaluators
             }
         }
 
-        public object StepOut()
-        {
-            if (Current != null && Current is MacroEvaluator == false)
-            {
-                Current.Evaluate();
-            }
-
-            Seek(1, SeekOrigin.Current);
-
-            return Return;
-        }
-
         public object Evaluate()
         {
-            while (_currentNode != null)
+            while (!Engine.IsCancellationRequested && _currentNode != null)
             {
                 Engine.Current = this;
 
-                while (Engine.Debug && Engine.Paused)
+                while (!Engine.IsCancellationRequested && Engine.IsDebugAllowed && Engine.IsPauseRequested)
                 {
-                    Thread.Sleep(5);
+                    if (Engine.IsStepInRequested)
+                    {
+                        Engine.IsStepInRequested = false;
+                        break;
+                    }
+
+                    Engine.Paused = true;
+
+                    Thread.Sleep(20);
                 }
 
-                StepOut();
+                Engine.Paused = false;
+
+                if (Current != null && Current is MacroEvaluator == false)
+                {
+                    Current.Evaluate();
+                }
+
+                Seek(1, SeekOrigin.Current);
             }
 
             return Return;

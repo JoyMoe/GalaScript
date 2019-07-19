@@ -1,4 +1,4 @@
-﻿using GalaScript.Interfaces;
+﻿using GalaScript.Abstract;
 
 namespace GalaScript.Internal
 {
@@ -6,7 +6,7 @@ namespace GalaScript.Internal
     {
         public static void Halt(IEngine engine)
         {
-            engine.Paused = true;
+            engine.Pause();
         }
 
         public static void Push(IScriptEvaluator script)

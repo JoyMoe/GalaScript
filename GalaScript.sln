@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalaScriptTests", "tests\Ga
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalaScriptBenchmarks", "tests\GalaScriptBenchmarks\GalaScriptBenchmarks.csproj", "{D25A3EAA-34D1-48E8-872A-54F38112793D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalaScript.Interfaces", "src\GalaScript.Interfaces\GalaScript.Interfaces.csproj", "{7AA3B532-4D38-4785-A302-3C59F71B7308}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalaScript.Abstract", "src\GalaScript.Abstract\GalaScript.Abstract.csproj", "{7AA3B532-4D38-4785-A302-3C59F71B7308}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalaToaster", "samples\GalaToaster\GalaToaster.csproj", "{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalaToaster", "samples\GalaToaster\GalaToaster.csproj", "{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,7 +57,7 @@ Global
 		{5AD2399F-BE41-44BA-A7B4-A76F6AA338EB} = {03CC9288-6E51-4308-9A2F-65ACF54ED5BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		        SolutionGuid = {1B529142-11E3-4533-9613-E3CE3D644510}
 		SolutionGuid = {BD810434-854E-4D57-9A8E-6AA9CF2C155B}
+		        SolutionGuid = {1B529142-11E3-4533-9613-E3CE3D644510}
 	EndGlobalSection
 EndGlobal

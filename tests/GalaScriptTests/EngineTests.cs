@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GalaScript;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 using NUnit.Framework;
 
 namespace GalaScriptTests

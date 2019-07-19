@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace GalaScript.Interfaces
+namespace GalaScript.Abstract
 {
     public interface IScriptEvaluator : IEvaluator
     {
@@ -20,8 +20,6 @@ namespace GalaScript.Interfaces
         void Seek(long offset, SeekOrigin origin);
 
         void Reset();
-
-        object StepOut();
 
         void ReplaceEnvironment(Dictionary<string, object> aliases = null);
 

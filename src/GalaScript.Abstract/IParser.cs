@@ -2,7 +2,7 @@
 using System.Text;
 using Sprache;
 
-namespace GalaScript.Interfaces
+namespace GalaScript.Abstract
 {
     public interface IParser
     {

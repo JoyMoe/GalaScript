@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Text;
 
-namespace GalaScript.Interfaces
+namespace GalaScript.Abstract
 {
-    public delegate void EngineEventHandler();
-
     public interface IEngine
     {
-        bool Debug { get; }
 
-        bool Paused { get; set; }
+        bool IsCancellationRequested { get; }
+
+        bool IsDebugAllowed { get; }
+
+        bool IsStepInRequested { get; }
+
+        bool IsPauseRequested { get; }
+
+        bool Paused { get; }
 
         event EngineEventHandler OnStartedHandler;
 
@@ -21,7 +26,7 @@ namespace GalaScript.Interfaces
 
         IParser Parser { get; set; }
 
-        IScriptEvaluator Current { get; set; }
+        IScriptEvaluator Current { get; }
 
         void Register(string name, Delegate func);
 
@@ -38,5 +43,13 @@ namespace GalaScript.Interfaces
         object Run();
 
         object Run(string str, Encoding encoding = null);
+
+        void Cancel();
+
+        void Continue();
+
+        void Pause();
+
+        void StepIn();
     }
 }

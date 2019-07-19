@@ -1,4 +1,4 @@
-﻿using GalaScript.Interfaces;
+﻿using GalaScript.Abstract;
 
 namespace GalaScriptTests
 {

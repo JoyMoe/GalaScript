@@ -3,7 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using GalaScript;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 
 namespace GalaScriptBenchmarks
 {

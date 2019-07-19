@@ -1,29 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using Avalonia.Threading;
+using AvaloniaEdit;
 using GalaScript;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 
 namespace GalaToaster
 {
-    /// <summary>
-    /// MainWindow.xaml 的交互逻辑
-    /// </summary>
-    public partial class MainWindow : Window
+    public class MainWindow : Window
     {
-        private IEngine _engine;
+        private readonly TextEditor _scriptBox;
+        private readonly Button _build;
+        private readonly Button _pause;
+        private readonly Button _stepIn;
+        private readonly Button _resume;
+        private readonly Button _stop;
+        private readonly TextBlock _status;
+        private readonly ListBox _aliasList;
+        private readonly ListBox _stackList;
+
+        private readonly IEngine _engine;
         private Thread _main;
 
         public Dictionary<string, object> Aliases => _engine?.Current?.Aliases;
@@ -31,48 +34,68 @@ namespace GalaToaster
         public MainWindow()
         {
             InitializeComponent();
+#if DEBUG
+            this.AttachDevTools();
+#endif
+
+            _scriptBox = this.Get<TextEditor>("ScriptBox");
+            _build = this.Get<Button>("Build");
+            _pause = this.Get<Button>("Pause");
+            _stepIn = this.Get<Button>("StepIn");
+            _resume = this.Get<Button>("Resume");
+            _stop = this.Get<Button>("Stop");
+            _status = this.Get<TextBlock>("Status");
+            _aliasList = this.Get<ListBox>("AliasList");
+            _stackList = this.Get<ListBox>("StackList");
 
             _engine = new ScriptEngine(true);
 
             decimal Add(decimal[] arguments) => arguments.Sum();
-            _engine.Register("add", (Func<decimal[], decimal>) Add);
+            _engine.Register("add", (Func<decimal[], decimal>)Add);
 
-            _engine.OnStartedHandler += () => Dispatcher.Invoke(() =>
+            _engine.OnStartedHandler += () => Dispatcher.UIThread.InvokeAsync(() =>
             {
-                ScriptBox.IsReadOnly = true;
+                _scriptBox.IsReadOnly = true;
 
-                Build.IsEnabled = false;
-                Pause.IsEnabled = true;
-                StepOut.IsEnabled = false;
-                Stop.IsEnabled = true;
+                _build.IsEnabled = false;
+                _pause.IsEnabled = true;
+                _stepIn.IsEnabled = false;
+                _resume.IsEnabled = false;
+                _stop.IsEnabled = true;
 
-                Status.Background = new SolidColorBrush(Colors.Green);
+                _status.Background = new SolidColorBrush(Colors.Green);
             });
-            _engine.OnPausedHandler += () => Dispatcher.Invoke(() =>
+            _engine.OnPausedHandler += () => Dispatcher.UIThread.InvokeAsync(() =>
             {
-                Pause.IsEnabled = false;
-                StepOut.IsEnabled = true;
+                _pause.IsEnabled = false;
+                _stepIn.IsEnabled = true;
+                _resume.IsEnabled = true;
 
-                Status.Background = new SolidColorBrush(Colors.Yellow);
-
-                var position = ScriptBox.GetCharacterIndexFromLineIndex((int)_engine.Current.CurrentLineNumber);
-                ScriptBox.Select(position, ScriptBox.Text.IndexOf(Environment.NewLine, position) - position);
+                _status.Background = new SolidColorBrush(Colors.Yellow);
 
                 Refresh_Click(null, null);
             });
-            _engine.OnResumedHandler += () => Dispatcher.Invoke(() =>
+            _engine.OnResumedHandler += () => Dispatcher.UIThread.InvokeAsync(() =>
             {
-                StepOut.IsEnabled = false;
-                Pause.IsEnabled = true;
+                _stepIn.IsEnabled = false;
+                _resume.IsEnabled = false;
+                _pause.IsEnabled = true;
 
-                Status.Background = new SolidColorBrush(Colors.Green);
+                _status.Background = new SolidColorBrush(Colors.Green);
             });
-            _engine.OnExitedHandler += () => Dispatcher.Invoke(() => Stop_Click(null, null));
+            _engine.OnExitedHandler += () => Dispatcher.UIThread.InvokeAsync(() => Stop_Click(null, null));
+
+            Closing += (s, e) => Stop_Click(null, null);
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
 
         private void Build_Click(object sender, RoutedEventArgs e)
         {
-            _engine.Prepare(ScriptBox.Text);
+            _engine.Prepare(_scriptBox.Text);
 
             _main = new Thread(() => _engine.Run());
             _main.Start();
@@ -80,43 +103,42 @@ namespace GalaToaster
 
         private void Pause_Click(object sender, RoutedEventArgs e)
         {
-            _engine.Paused = true;
+            _engine.Pause();
         }
 
-        private void StepOut_Click(object sender, RoutedEventArgs e)
+        private void StepIn_Click(object sender, RoutedEventArgs e)
         {
-            _engine.Paused = false;
+            _engine.StepIn();
+        }
+
+        private void Resume_Click(object sender, RoutedEventArgs e)
+        {
+            _engine.Continue();
         }
 
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
-            AliasList.Items.Clear();
-            foreach (var alias in _engine.Current.Aliases)
-            {
-                AliasList.Items.Add(alias);
-            }
+            _aliasList.Items = null;
+            _aliasList.Items = _engine.Current?.Aliases;
 
-            StackList.Items.Clear();
-            foreach (var alias in _engine.Current.Stack)
-            {
-                StackList.Items.Add(alias);
-            }
+            _stackList.Items = null;
+            _stackList.Items = _engine.Current?.Stack;
         }
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
-            _main.Abort();
-
+            _engine.Cancel();
             _engine.Reset();
 
-            ScriptBox.IsReadOnly = false;
+            _scriptBox.IsReadOnly = false;
 
-            Pause.IsEnabled = false;
-            StepOut.IsEnabled = false;
-            Stop.IsEnabled = false;
-            Build.IsEnabled = true;
+            _pause.IsEnabled = false;
+            _stepIn.IsEnabled = false;
+            _resume.IsEnabled = false;
+            _stop.IsEnabled = false;
+            _build.IsEnabled = true;
 
-            Status.Background = new SolidColorBrush(Colors.Red);
+            _status.Background = new SolidColorBrush(Colors.Red);
         }
     }
 }

@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using GalaScript.Evaluators;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 using Sprache;
 
 namespace GalaScript
 {
     public class ExpressionParser : IParser
     {
-        private readonly IEngine _engine;
+        private readonly ScriptEngine _engine;
 
         private string path;
 
@@ -95,7 +95,7 @@ namespace GalaScript
 
         #endregion
 
-        public ExpressionParser(IEngine engine)
+        public ExpressionParser(ScriptEngine engine)
         {
             _engine = engine;
 

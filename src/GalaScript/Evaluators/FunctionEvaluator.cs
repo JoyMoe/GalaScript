@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 
 namespace GalaScript.Evaluators
 {

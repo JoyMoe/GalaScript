@@ -17,11 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GalaScript.Interfaces\GalaScript.Interfaces.csproj" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+    <ProjectReference Include="..\GalaScript.Abstract\GalaScript.Abstract.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,11 @@
-﻿<Window x:Class="GalaToaster.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:GalaToaster"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="GalaToaster.MainWindow"
+        Title="MainWindow">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="52"/>
@@ -15,27 +15,50 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBox x:Name="ScriptBox" Margin="10" Grid.RowSpan="2" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto"/>
+        <AvalonEdit:TextEditor
+            Name="ScriptBox"
+            Margin="10" Grid.RowSpan="2"
+            ShowLineNumbers="True"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Visible"/>
+        <DockPanel Grid.Column="1" Margin="10">
+            <TextBlock Name="Status" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Background="Red"/>
+            <Button Name="Build" ToolTip.Tip="Build &amp; Run" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Build_Click">
+                <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+            <Button Name="Pause" ToolTip.Tip="Pause" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Pause_Click" IsEnabled="False">
+                <TextBlock Text="&#xE769;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+            <Button Name="StepIn" ToolTip.Tip="Step In" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="StepIn_Click" IsEnabled="False">
+                <TextBlock Text="&#xE896;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+            <Button Name="StepOut" ToolTip.Tip="Step Out" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" IsEnabled="False">
+                <TextBlock Text="&#xE898;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+            <Button Name="StepOver" ToolTip.Tip="Step Over" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" IsEnabled="False">
+                <TextBlock Text="&#xE890;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+            <Button Name="Resume" ToolTip.Tip="Resume" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Resume_Click" IsEnabled="False">
+                <TextBlock Text="&#xE72A;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+            <Button Name="Refresh" ToolTip.Tip="Refresh" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Refresh_Click">
+                <TextBlock Text="&#xE895;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+            <Button Name="Stop" ToolTip.Tip="Stop" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Stop_Click" IsEnabled="False">
+                <TextBlock Text="&#xE71A;" FontFamily="Segoe MDL2 Assets" />
+            </Button>
+        </DockPanel>
         <TabControl Grid.Column="1" Margin="10" Grid.Row="1">
             <TabItem Header="变量">
                 <Grid Background="#FFE5E5E5">
-                    <ListView x:Name="AliasList"/>
+                    <ListBox Name="AliasList"/>
                 </Grid>
             </TabItem>
             <TabItem Header="栈">
                 <Grid Background="#FFE5E5E5">
-                    <ListView x:Name="StackList"/>
+                    <ListBox Name="StackList"/>
                 </Grid>
             </TabItem>
         </TabControl>
-        <ToolBar Grid.Column="1" Margin="10">
-            <Label x:Name="Status" Width="18" VerticalAlignment="Stretch" Margin="0,0,0,0" Background="Red"/>
-            <Button x:Name="Build" Content="&#xE768;" Width="18" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Build_Click" FontFamily="Segoe MDL2 Assets"/>
-            <Button x:Name="Pause" Content="&#xE769;" Width="18" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Pause_Click" FontFamily="Segoe MDL2 Assets" IsEnabled="False"/>
-            <Button x:Name="StepOut" Content="&#xE72A;" Width="18" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="StepOut_Click" FontFamily="Segoe MDL2 Assets" IsEnabled="False"/>
-            <Button x:Name="Refresh" Content="&#xE72C;" Width="18" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Refresh_Click" FontFamily="Segoe MDL2 Assets"/>
-            <Button x:Name="Stop" Content="&#xE71A;" Width="18" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Stop_Click" FontFamily="Segoe MDL2 Assets" IsEnabled="False"/>
-        </ToolBar>
-
     </Grid>
 </Window>

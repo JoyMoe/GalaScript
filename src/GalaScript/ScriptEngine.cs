@@ -5,16 +5,16 @@ using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
 using GalaScript.Internal;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 using System.Reflection;
 
 namespace GalaScript
 {
     public class ScriptEngine : IEngine
     {
-        private readonly Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>>();
-
         private bool _paused;
+
+        private readonly Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>>();
 
         private IScriptEvaluator _script;
 
@@ -24,28 +24,24 @@ namespace GalaScript
 
         private static readonly object Void = new object();
 
-        private void PrepareOperations()
-        {
-            foreach (var method in typeof(EngineOperations).GetMethods(BindingFlags.Static | BindingFlags.Public))
-                this.Register(method.Name.ToLower(), method);
-        }
+        public bool IsCancellationRequested { get; private set; }
 
-        public ScriptEngine(bool debug = false)
-        {
-            Debug = debug;
+        public bool IsDebugAllowed { get; }
 
-            Parser = new ExpressionParser(this);
+        public bool IsStepInRequested { get; internal set; }
 
-            PrepareOperations();
-        }
-
-        public bool Debug { get; }
+        public bool IsPauseRequested { get; private set; }
 
         public bool Paused
         {
             get => _paused;
-            set
+            internal set
             {
+                if (_paused == value)
+                {
+                    return;
+                }
+
                 _paused = value;
 
                 if (_paused)
@@ -69,7 +65,22 @@ namespace GalaScript
 
         public IParser Parser { get; set; }
 
-        public IScriptEvaluator Current { get; set; }
+        public IScriptEvaluator Current { get; internal set; }
+
+        private void PrepareOperations()
+        {
+            foreach (var method in typeof(EngineOperations).GetMethods(BindingFlags.Static | BindingFlags.Public))
+                this.Register(method.Name.ToLower(), method);
+        }
+
+        public ScriptEngine(bool debug = false)
+        {
+            IsDebugAllowed = debug;
+
+            Parser = new ExpressionParser(this);
+
+            PrepareOperations();
+        }
 
         public void Register(string name, Delegate func)
         {
@@ -201,7 +212,9 @@ namespace GalaScript
             _aliases.Clear();
 
             Current = null;
-            Paused = false;
+            IsCancellationRequested = false;
+            IsPauseRequested = false;
+            IsStepInRequested = false;
 
             _script?.Reset();
         }
@@ -222,6 +235,26 @@ namespace GalaScript
             Prepare(str, encoding);
 
             return Run();
+        }
+
+        public void Cancel()
+        {
+            IsCancellationRequested = true;
+        }
+
+        public void Continue()
+        {
+            IsPauseRequested = false;
+        }
+
+        public void Pause()
+        {
+            IsPauseRequested = true;
+        }
+
+        public void StepIn()
+        {
+            IsStepInRequested = true;
         }
     }
 }

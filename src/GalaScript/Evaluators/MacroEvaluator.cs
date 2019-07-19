@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GalaScript.Interfaces;
+using GalaScript.Abstract;
 
 namespace GalaScript.Evaluators
 {
@@ -8,7 +8,7 @@ namespace GalaScript.Evaluators
     {
         private readonly string[] _parameters;
 
-        public MacroEvaluator(IEngine engine, string name, string[] parameters, string str) : base(engine)
+        public MacroEvaluator(ScriptEngine engine, string name, string[] parameters, string str) : base(engine)
         {
             Name = name;
             _parameters = parameters ?? new string[0];
@@ -17,7 +17,7 @@ namespace GalaScript.Evaluators
 
             foreach (var exp in evaluators)
             {
-                if (Engine.Debug == false && exp == null) continue;
+                if (Engine.IsDebugAllowed == false && exp == null) continue;
 
                 exp?.SetCaller(this);
 
