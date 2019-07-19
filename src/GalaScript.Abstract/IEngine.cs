@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 
 namespace GalaScript.Abstract
 {
@@ -10,9 +11,7 @@ namespace GalaScript.Abstract
 
         bool IsDebugAllowed { get; }
 
-        bool IsStepInRequested { get; }
-
-        bool IsPauseRequested { get; }
+        CancellationTokenSource PauseTokenSource { get; }
 
         bool Paused { get; }
 
@@ -44,12 +43,12 @@ namespace GalaScript.Abstract
 
         object Run(string str, Encoding encoding = null);
 
+        object StepIn();
+
         void Cancel();
 
         void Continue();
 
         void Pause();
-
-        void StepIn();
     }
 }

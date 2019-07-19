@@ -21,6 +21,8 @@ namespace GalaScript.Abstract
 
         void Reset();
 
+        object StepIn();
+
         void ReplaceEnvironment(Dictionary<string, object> aliases = null);
 
         void ReplaceEnvironment(ref Dictionary<string, object> aliases);

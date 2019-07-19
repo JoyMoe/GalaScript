@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
-using GalaScript.Internal;
-using GalaScript.Abstract;
 using System.Reflection;
+using System.Text;
+using System.Threading;
+using GalaScript.Abstract;
+using GalaScript.Internal;
 
 namespace GalaScript
 {
@@ -28,9 +29,7 @@ namespace GalaScript
 
         public bool IsDebugAllowed { get; }
 
-        public bool IsStepInRequested { get; internal set; }
-
-        public bool IsPauseRequested { get; private set; }
+        public CancellationTokenSource PauseTokenSource { get; private set; }
 
         public bool Paused
         {
@@ -213,8 +212,7 @@ namespace GalaScript
 
             Current = null;
             IsCancellationRequested = false;
-            IsPauseRequested = false;
-            IsStepInRequested = false;
+            PauseTokenSource = null;
 
             _script?.Reset();
         }
@@ -237,6 +235,11 @@ namespace GalaScript
             return Run();
         }
 
+        public object StepIn()
+        {
+            return Current?.StepIn();
+        }
+
         public void Cancel()
         {
             IsCancellationRequested = true;
@@ -244,17 +247,12 @@ namespace GalaScript
 
         public void Continue()
         {
-            IsPauseRequested = false;
+            if (Paused) PauseTokenSource.Cancel();
         }
 
         public void Pause()
         {
-            IsPauseRequested = true;
-        }
-
-        public void StepIn()
-        {
-            IsStepInRequested = true;
+            PauseTokenSource = new CancellationTokenSource();
         }
     }
 }

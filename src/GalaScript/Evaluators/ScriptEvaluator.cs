@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using GalaScript.Abstract;
 
 namespace GalaScript.Evaluators
@@ -143,33 +143,40 @@ namespace GalaScript.Evaluators
             }
         }
 
+        public object StepIn()
+        {
+            if (Current != null && Current is MacroEvaluator == false)
+            {
+                Current.Evaluate();
+            }
+
+            Seek(1, SeekOrigin.Current);
+
+            return Return;
+        }
+
         public object Evaluate()
         {
             while (!Engine.IsCancellationRequested && _currentNode != null)
             {
                 Engine.Current = this;
 
-                while (!Engine.IsCancellationRequested && Engine.IsDebugAllowed && Engine.IsPauseRequested)
+                if (Engine.PauseTokenSource != null)
                 {
-                    if (Engine.IsStepInRequested)
-                    {
-                        Engine.IsStepInRequested = false;
-                        break;
-                    }
-
                     Engine.Paused = true;
-
-                    Thread.Sleep(20);
+                    try
+                    {
+                        Task.Delay(-1, Engine.PauseTokenSource.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        //
+                    }
                 }
 
                 Engine.Paused = false;
 
-                if (Current != null && Current is MacroEvaluator == false)
-                {
-                    Current.Evaluate();
-                }
-
-                Seek(1, SeekOrigin.Current);
+                StepIn();
             }
 
             return Return;
