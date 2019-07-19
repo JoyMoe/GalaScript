@@ -166,7 +166,7 @@ namespace GalaScript.Evaluators
                     Engine.Paused = true;
                     try
                     {
-                        Task.Delay(-1, Engine.PauseTokenSource.Token);
+                        Task.Delay(-1).Wait(Engine.PauseTokenSource.Token);
                     }
                     catch (OperationCanceledException)
                     {
