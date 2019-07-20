@@ -88,7 +88,10 @@ namespace GalaScript
             var engineExpr = Expression.Parameter(typeof(IEngine), "engine");
             var callerExpr = Expression.Parameter(typeof(IScriptEvaluator), "caller");
             var paraExpr = Expression.Parameter(typeof(object[]), "obj");
+            //var optionsExpr = Expression.Parameter(typeof(Dictionary<string, object>), "options"); // TODO 
             var callExpr = new List<Expression>(funcParameters.Length);
+
+            var paraLenExpr = Expression.Property(paraExpr, "Length");
 
             var converter = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) });
 
@@ -98,10 +101,26 @@ namespace GalaScript
                 var pType = info.ParameterType;
                 if (pType.IsValueType || pType == typeof(string))
                 {
-                    // ReSharper disable AssignNullToNotNullAttribute
-                    var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex++)), Expression.Constant(pType));
-                    // ReSharper restore AssignNullToNotNullAttribute
-                    callExpr.Add(Expression.Convert(convert, pType));
+                    Expression valueExpr;
+                    if (info.IsOptional && info.HasDefaultValue)
+                    {
+                        // value = objIndex > obj.Length ? info.DefaultValue : obj[objIndex]
+                        valueExpr = Expression.Condition(
+                            Expression.GreaterThanOrEqual(Expression.Constant(objIndex), paraLenExpr),
+                            Expression.Convert(Expression.Constant(info.DefaultValue), pType),
+                            Expression.Convert(Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex)), Expression.Constant(pType)), pType)
+                            );
+                        callExpr.Add(Expression.Convert(valueExpr, pType));
+
+                        objIndex++;
+                    }
+                    else
+                    {
+                        // ReSharper disable AssignNullToNotNullAttribute
+                        var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex++)), Expression.Constant(pType));
+                        // ReSharper restore AssignNullToNotNullAttribute
+                        callExpr.Add(Expression.Convert(convert, pType));
+                    }
                 }
                 else if (pType == typeof(IEngine))
                 {
