@@ -113,6 +113,9 @@ namespace GalaScriptTests
             var foo = _parser.Prepare("# This is a comment").FirstOrDefault();
             Assert.IsNull(foo);
 
+            var cStyle = _parser.Prepare("// This is a C-style comment").FirstOrDefault();
+            Assert.IsNull(cStyle);
+
             var bar = _parser.Prepare("[add 2 0] # This is an in-line comment").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(bar);
 

@@ -42,7 +42,7 @@ namespace GalaScript
             select new StringConstantEvaluator(text);
 
         private static readonly Parser<string> Comment =
-            from op in Parse.Char('#')
+            from op in Parse.String("#").Or(Parse.String("//"))
             from space in Space.Optional()
             from comment in Parse.CharExcept('\n').Many().Text()
             select comment;
