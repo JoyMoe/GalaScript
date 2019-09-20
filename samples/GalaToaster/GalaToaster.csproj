@@ -12,9 +12,9 @@
     </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.8.0" />
+    <PackageReference Include="Avalonia" Version="0.8.2" />
     <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.8.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.8.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.8.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\GalaScript.Abstract\GalaScript.Abstract.csproj" />
