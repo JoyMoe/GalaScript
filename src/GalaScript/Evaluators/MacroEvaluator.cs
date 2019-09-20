@@ -42,7 +42,7 @@ namespace GalaScript.Evaluators
 
         public void SetArguments(object[] arguments)
         {
-            for (var i = 0; i < _parameters.Length; i++)
+            for (int i = 0; i < _parameters.Length; i++)
             {
                 SetAlias(_parameters[i], arguments[i]);
             }

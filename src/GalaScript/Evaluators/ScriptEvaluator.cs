@@ -117,14 +117,14 @@ namespace GalaScript.Evaluators
 
             if (offset > 0)
             {
-                for (var i = 0; i < offset; i++)
+                for (int i = 0; i < offset; i++)
                 {
                     _currentNode = _currentNode?.Next;
                 }
             }
             else
             {
-                for (var i = 0; i > offset; i--)
+                for (int i = 0; i > offset; i--)
                 {
                     _currentNode = _currentNode?.Previous;
                 }

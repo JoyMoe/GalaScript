@@ -13,7 +13,7 @@ namespace GalaScript
     {
         private readonly ScriptEngine _engine;
 
-        private string path;
+        private string _path;
 
         #region grammars
 
@@ -141,7 +141,7 @@ namespace GalaScript
                 from op in Parse.Char('%')
                 from space in Space.Optional()
                 from file in Parse.AnyChar.Except(Parse.LineTerminator).Many().Text()
-                select new ScriptEvaluator(_engine, File.ReadAllText(Path.Combine(path, file)));
+                select new ScriptEvaluator(_engine, File.ReadAllText(Path.Combine(_path, file)));
 
             Evaluator = Import.Or(Macro).Or(Label).Or(Text).Or(Alias).Or(Function);
         }
@@ -167,7 +167,7 @@ namespace GalaScript
 
         public IScriptEvaluator LoadString(string str)
         {
-            path = Path.GetDirectoryName(Environment.CurrentDirectory);
+            _path = Path.GetDirectoryName(Environment.CurrentDirectory);
 
             return new ScriptEvaluator(_engine, str);
         }
@@ -179,7 +179,7 @@ namespace GalaScript
                 encoding = Encoding.Default;
             }
 
-            path = Path.GetDirectoryName(Path.GetFullPath(file));
+            _path = Path.GetDirectoryName(Path.GetFullPath(file));
 
             var str = File.ReadAllText(file, encoding);
 

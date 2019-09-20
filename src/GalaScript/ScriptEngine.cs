@@ -88,28 +88,29 @@ namespace GalaScript
             var engineExpr = Expression.Parameter(typeof(IEngine), "engine");
             var callerExpr = Expression.Parameter(typeof(IScriptEvaluator), "caller");
             var paraExpr = Expression.Parameter(typeof(object[]), "obj");
-            //var optionsExpr = Expression.Parameter(typeof(Dictionary<string, object>), "options"); // TODO 
+            //var optionsExpr = Expression.Parameter(typeof(Dictionary<string, object>), "options"); // TODO
             var callExpr = new List<Expression>(funcParameters.Length);
 
             var paraLenExpr = Expression.Property(paraExpr, "Length");
 
             var converter = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) });
 
-            var objIndex = 0;
+            int objIndex = 0;
             foreach (var info in funcParameters)
             {
                 var pType = info.ParameterType;
                 if (pType.IsValueType || pType == typeof(string))
                 {
-                    Expression valueExpr;
                     if (info.IsOptional && info.HasDefaultValue)
                     {
                         // value = objIndex > obj.Length ? info.DefaultValue : obj[objIndex]
-                        valueExpr = Expression.Condition(
+                        Expression valueExpr = Expression.Condition(
                             Expression.GreaterThanOrEqual(Expression.Constant(objIndex), paraLenExpr),
                             Expression.Convert(Expression.Constant(info.DefaultValue), pType),
+                            // ReSharper disable AssignNullToNotNullAttribute
                             Expression.Convert(Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex)), Expression.Constant(pType)), pType)
-                            );
+                            // ReSharper restore AssignNullToNotNullAttribute
+                        );
                         callExpr.Add(Expression.Convert(valueExpr, pType));
 
                         objIndex++;
@@ -164,7 +165,7 @@ namespace GalaScript
 
             var body = Expression.Call(func.Method.IsStatic ? null : Expression.Constant(func.Target), func.Method, callExpr);
 
-            var isAction = func.Method.ReturnType == typeof(void);
+            bool isAction = func.Method.ReturnType == typeof(void);
 
             Func<IEngine, IScriptEvaluator, object[], object> fun;
             if(isAction)

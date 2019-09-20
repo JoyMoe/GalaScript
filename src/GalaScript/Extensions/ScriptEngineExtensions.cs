@@ -3,6 +3,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
+// ReSharper disable once CheckNamespace
 namespace GalaScript.Abstract
 {
     public static class ScriptEngineExtensions
