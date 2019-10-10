@@ -10,7 +10,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using AvaloniaEdit;
 using GalaScript;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 
 namespace GalaToaster
 {
@@ -26,7 +26,7 @@ namespace GalaToaster
         private readonly ListBox _aliasList;
         private readonly ListBox _stackList;
 
-        private readonly IEngine _engine;
+        private readonly IScriptEngine _engine;
         private Thread _main;
 
         public Dictionary<string, object> Aliases => _engine?.Current?.Aliases;

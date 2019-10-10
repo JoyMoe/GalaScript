@@ -1,10 +1,10 @@
-﻿using GalaScript.Abstract;
+﻿using GalaScript.Interfaces;
 
 namespace GalaScript.Internal
 {
     internal static class EngineOperations
     {
-        public static void Halt(IEngine engine)
+        public static void Halt(IScriptEngine engine)
         {
             engine.Pause();
         }

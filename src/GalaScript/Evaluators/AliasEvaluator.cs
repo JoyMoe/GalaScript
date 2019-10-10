@@ -1,16 +1,16 @@
-﻿using GalaScript.Abstract;
+﻿using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
 {
     public class AliasEvaluator : IEvaluator
     {
-        private readonly IEngine _engine;
+        private readonly IScriptEngine _engine;
         private IScriptEvaluator _caller;
 
         private readonly string _name;
         private readonly IEvaluator _value;
 
-        public AliasEvaluator(IEngine engine, string name, IEvaluator value = null)
+        public AliasEvaluator(IScriptEngine engine, string name, IEvaluator value = null)
         {
             _engine = engine;
             _name = name;

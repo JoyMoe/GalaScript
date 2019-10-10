@@ -2,7 +2,7 @@
 using System.Linq;
 using GalaScript;
 using GalaScript.Evaluators;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 using NUnit.Framework;
 using Sprache;
 

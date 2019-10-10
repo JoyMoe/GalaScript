@@ -3,7 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using GalaScript;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 
 namespace GalaScriptBenchmarks
 {
@@ -11,7 +11,7 @@ namespace GalaScriptBenchmarks
     [RPlotExporter, RankColumn, MemoryDiagnoser]
     public class SingleLine
     {
-        private readonly IEngine _engine;
+        private readonly IScriptEngine _engine;
 
         private static decimal Add(params decimal[] arguments) =>
             arguments.Aggregate(0.0m, (acc, argument) => acc + argument);
@@ -55,7 +55,7 @@ namespace GalaScriptBenchmarks
     [RPlotExporter, RankColumn, MemoryDiagnoser]
     public class Block
     {
-        private readonly IEngine _engine;
+        private readonly IScriptEngine _engine;
 
         private static decimal Add(params decimal[] arguments) =>
             arguments.Aggregate(0.0m, (acc, argument) => acc + argument);

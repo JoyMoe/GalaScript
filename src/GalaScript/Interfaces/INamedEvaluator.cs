@@ -1,4 +1,4 @@
-﻿namespace GalaScript.Abstract
+﻿namespace GalaScript.Interfaces
 {
     public interface INamedEvaluator
     {

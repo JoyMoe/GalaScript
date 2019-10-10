@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using GalaScript;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 using NUnit.Framework;
 
 namespace GalaScriptTests
 {
     public class EngineTests
     {
-        private readonly IEngine _engine;
+        private readonly IScriptEngine _engine;
 
         private static decimal Add(params decimal[] arguments) =>
             arguments.Aggregate(0.0m, (acc, argument) => acc + argument);

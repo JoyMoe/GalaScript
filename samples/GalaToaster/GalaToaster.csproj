@@ -17,7 +17,6 @@
     <PackageReference Include="Avalonia.Desktop" Version="0.8.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GalaScript.Abstract\GalaScript.Abstract.csproj" />
     <ProjectReference Include="..\..\src\GalaScript\GalaScript.csproj" />
   </ItemGroup>
 </Project>

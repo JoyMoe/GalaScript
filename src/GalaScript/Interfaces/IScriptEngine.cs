@@ -2,11 +2,10 @@
 using System.Text;
 using System.Threading;
 
-namespace GalaScript.Abstract
+namespace GalaScript.Interfaces
 {
-    public interface IEngine
+    public interface IScriptEngine
     {
-
         bool IsCancellationRequested { get; }
 
         bool IsDebugAllowed { get; }

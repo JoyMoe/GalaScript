@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
 {

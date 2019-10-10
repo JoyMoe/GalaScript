@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace GalaScript.Abstract
+namespace GalaScript.Interfaces
 {
-    public interface IScriptEvaluator : IEvaluator
+    public interface IScriptEvaluator : Interfaces.IEvaluator
     {
         long CurrentLineNumber { get; }
 
-        IEvaluator Current { get; }
+        Interfaces.IEvaluator Current { get; }
 
         Stack<object> Stack { get; }
 

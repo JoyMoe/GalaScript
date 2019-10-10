@@ -1,17 +1,17 @@
 ﻿using System.Linq;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
 {
     public class FunctionEvaluator : IEvaluator
     {
-        private readonly IEngine _engine;
+        private readonly IScriptEngine _engine;
         private IScriptEvaluator _caller;
 
         private readonly string _name;
         private readonly IEvaluator[] _parameters;
 
-        public FunctionEvaluator(IEngine engine, string name, IEvaluator[] parameters)
+        public FunctionEvaluator(IScriptEngine engine, string name, IEvaluator[] parameters)
         {
             _engine = engine;
             _name = name;

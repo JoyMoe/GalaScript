@@ -1,4 +1,4 @@
-﻿namespace GalaScript.Abstract
+﻿namespace GalaScript
 {
     public delegate void EngineEventHandler();
 }

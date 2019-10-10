@@ -6,16 +6,16 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 using GalaScript.Internal;
 
 namespace GalaScript
 {
-    public class ScriptEngine : IEngine
+    public class ScriptEngine : IScriptEngine
     {
         private bool _paused;
 
-        private readonly Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IEngine, IScriptEvaluator, object[], object>>();
+        private readonly Dictionary<string, Func<IScriptEngine, IScriptEvaluator, object[], object>> _functions = new Dictionary<string, Func<IScriptEngine, IScriptEvaluator, object[], object>>();
 
         private IScriptEvaluator _script;
 
@@ -85,7 +85,7 @@ namespace GalaScript
         {
             var funcParameters = func.Method.GetParameters();
 
-            var engineExpr = Expression.Parameter(typeof(IEngine), "engine");
+            var engineExpr = Expression.Parameter(typeof(IScriptEngine), "engine");
             var callerExpr = Expression.Parameter(typeof(IScriptEvaluator), "caller");
             var paraExpr = Expression.Parameter(typeof(object[]), "obj");
             //var optionsExpr = Expression.Parameter(typeof(Dictionary<string, object>), "options"); // TODO
@@ -123,7 +123,7 @@ namespace GalaScript
                         callExpr.Add(Expression.Convert(convert, pType));
                     }
                 }
-                else if (pType == typeof(IEngine))
+                else if (pType == typeof(IScriptEngine))
                 {
                     callExpr.Add(engineExpr);
                 }
@@ -167,10 +167,10 @@ namespace GalaScript
 
             bool isAction = func.Method.ReturnType == typeof(void);
 
-            Func<IEngine, IScriptEvaluator, object[], object> fun;
+            Func<IScriptEngine, IScriptEvaluator, object[], object> fun;
             if(isAction)
             {
-                var actionCaller = Expression.Lambda<Action<IEngine, IScriptEvaluator, object[]>>(body, engineExpr, callerExpr, paraExpr).Compile();
+                var actionCaller = Expression.Lambda<Action<IScriptEngine, IScriptEvaluator, object[]>>(body, engineExpr, callerExpr, paraExpr).Compile();
                 fun = (engine, caller, obj) =>
                 {
                     actionCaller(engine, caller, obj);
@@ -180,7 +180,7 @@ namespace GalaScript
             else
             {
                 var boxed = Expression.Convert(body, typeof(object));
-                var funcCaller = Expression.Lambda<Func<IEngine, IScriptEvaluator, object[], object>>(boxed, engineExpr,callerExpr, paraExpr).Compile();
+                var funcCaller = Expression.Lambda<Func<IScriptEngine, IScriptEvaluator, object[], object>>(boxed, engineExpr,callerExpr, paraExpr).Compile();
                 fun = (engine, caller, obj) => funcCaller(engine, caller, obj);
             }
 

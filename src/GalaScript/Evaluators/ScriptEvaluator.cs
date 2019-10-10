@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GalaScript.Abstract;
+using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
 {
@@ -16,7 +16,7 @@ namespace GalaScript.Evaluators
         protected readonly Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>> Labels =
             new Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>>();
 
-        private Stack<object> _stack = new Stack<object>(10);
+        private Stack<object> _stack = new Stack<object>();
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();
 
         protected ScriptEvaluator(ScriptEngine engine)
