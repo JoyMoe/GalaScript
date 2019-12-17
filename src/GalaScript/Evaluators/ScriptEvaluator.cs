@@ -102,22 +102,13 @@ namespace GalaScript.Evaluators
 
         public void Seek(long offset, SeekOrigin origin)
         {
-            switch (origin)
+            (_currentNode, CurrentLineNumber) = origin switch
             {
-                case SeekOrigin.Begin:
-                    _currentNode = Script.First;
-                    CurrentLineNumber = offset;
-                    break;
-                case SeekOrigin.Current:
-                    CurrentLineNumber += offset;
-                    break;
-                case SeekOrigin.End:
-                    _currentNode = Script.Last;
-                    CurrentLineNumber = Script.Count + offset;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
-            }
+                SeekOrigin.Begin => (Script.First, offset),
+                SeekOrigin.Current => (_currentNode, CurrentLineNumber + offset),
+                SeekOrigin.End => (Script.Last, TotalLineNumber + offset),
+                _ => throw new ArgumentOutOfRangeException(nameof(origin), origin, null)
+            };
 
             if (offset > 0)
             {

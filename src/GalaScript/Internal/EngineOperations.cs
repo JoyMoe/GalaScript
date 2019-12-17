@@ -31,20 +31,12 @@ namespace GalaScript.Internal
 
         public static void Goif(IScriptEvaluator script, string label)
         {
-            bool state;
-
-            switch (script.Return)
+            bool state = script.Return switch
             {
-                case string @string:
-                    state = !string.IsNullOrWhiteSpace(@string);
-                    break;
-                case decimal @decimal:
-                    state = @decimal > 0;
-                    break;
-                default:
-                    state = script.Return != null;
-                    break;
-            }
+                string @string => !string.IsNullOrWhiteSpace(@string),
+                decimal @decimal => (@decimal > 0),
+                _ => (script.Return != null)
+            };
 
             if (state)
             {
