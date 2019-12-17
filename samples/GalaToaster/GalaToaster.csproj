@@ -1,22 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
+    <Authors>Chino Chang</Authors>
+    <Description>The GalaScript Toaster</Description>
+
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Update="**\*.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
-    <AvaloniaResource Include="**\*.xaml">
-      <SubType>Designer</SubType>
-    </AvaloniaResource>
+    <EmbeddedResource Include="**\*.xaml" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.8.2" />
     <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.8.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.8.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.8.0" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\GalaScript\GalaScript.csproj" />
   </ItemGroup>
+
 </Project>

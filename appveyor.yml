@@ -1,24 +1,22 @@
-version: 0.1.0
+image: Visual Studio 2019
+version: '0.1.0-ci.{build}'
 init:
   - ps: |
       if ($env:APPVEYOR_REPO_TAG -eq "false")
       {
-        Update-AppveyorBuild -Version "$env:APPVEYOR_BUILD_VERSION-ci.$env:APPVEYOR_BUILD_NUMBER+sha.$($env:APPVEYOR_REPO_COMMIT.Substring(0, 9))"
+        Update-AppveyorBuild -Version "$env:APPVEYOR_BUILD_VERSION+sha.$($env:APPVEYOR_REPO_COMMIT.Substring(0, 9))"
+      } else {
+        Update-AppveyorBuild -Version "$env:APPVEYOR_REPO_TAG_NAME"
       }
 skip_branch_with_pr: true
-image: Visual Studio 2017
 dotnet_csproj:
   patch: true
-  file: '**\*.csproj'
+  file: '**\*.csproj;**\*.props'
   version: '{version}'
   package_version: '{version}'
 install:
-  - nuget restore
-  - choco install codecov
-nuget:
-  account_feed: true
-  project_feed: true
-  disable_publish_on_pr: true
+  - appveyor-retry dotnet restore -v Minimal
+  - appveyor-retry choco install codecov
 configuration: Release
 build:
   parallel: true
@@ -26,10 +24,8 @@ build:
   publish_nuget_symbols: true
   include_nuget_references: true
   verbosity: normal
-test_script:
-  - dotnet test tests/GalaScriptTests/GalaScriptTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../../coverage.xml --logger:Appveyor
 after_test:
-  - codecov -f "coverage.xml"
+  - codecov -f "tests/GalaScriptTests/coverage.opencover.xml"
 deploy:
   - provider: NuGet
     name: MyGet

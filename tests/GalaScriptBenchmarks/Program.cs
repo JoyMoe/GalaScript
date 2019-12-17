@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using GalaScript;
 using GalaScript.Interfaces;
 
 namespace GalaScriptBenchmarks
 {
-    [ClrJob(true), CoreJob, MonoJob, CoreRtJob]
-    [RPlotExporter, RankColumn, MemoryDiagnoser]
+    [SimpleJob(RuntimeMoniker.Net47)]
+    [SimpleJob(RuntimeMoniker.Mono)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
+    [SimpleJob(RuntimeMoniker.CoreRt30)]
+    [RPlotExporter]
+    [RankColumn]
+    [MemoryDiagnoser]
     public class SingleLine
     {
         private readonly IScriptEngine _engine;
@@ -51,8 +57,13 @@ namespace GalaScriptBenchmarks
         }
     }
 
-    [ClrJob(true), CoreJob, MonoJob, CoreRtJob]
-    [RPlotExporter, RankColumn, MemoryDiagnoser]
+    [SimpleJob(RuntimeMoniker.Net47)]
+    [SimpleJob(RuntimeMoniker.Mono)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp30)]
+    [SimpleJob(RuntimeMoniker.CoreRt30)]
+    [RPlotExporter]
+    [RankColumn]
+    [MemoryDiagnoser]
     public class Block
     {
         private readonly IScriptEngine _engine;

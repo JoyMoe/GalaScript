@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:avalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="GalaToaster.MainWindow"
         Title="MainWindow">
@@ -15,13 +15,16 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <AvalonEdit:TextEditor
+        <avalonEdit:TextEditor
             Name="ScriptBox"
-            Margin="10" Grid.RowSpan="2"
+            Background="Gray"
+            Margin="10"
+            Grid.RowSpan="2"
+            Foreground="White"
             ShowLineNumbers="True"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Visible"/>
-        <DockPanel Grid.Column="1" Margin="10">
+        <DockPanel Grid.Row="0" Grid.Column="1" Margin="10">
             <TextBlock Name="Status" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Background="Red"/>
             <Button Name="Build" ToolTip.Tip="Build &amp; Run" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Build_Click">
                 <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" />
