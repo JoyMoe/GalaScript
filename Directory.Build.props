@@ -12,12 +12,7 @@
 
     <PackageLicense>LICENSE</PackageLicense>
     <PackageProjectUrl>https://github.com/JoyMoe/GalaScript</PackageProjectUrl>
-    <PackageIcon>gala.png</PackageIcon>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)gala.png" Pack="true" PackagePath="" />
-  </ItemGroup>
 
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>
