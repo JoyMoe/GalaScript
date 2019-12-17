@@ -229,6 +229,8 @@ namespace GalaScript
                 : Parser.LoadString(str);
 
             _script.ReplaceEnvironment(ref _stack, ref _aliases);
+
+            Current = _script;
         }
 
         public void Reset()
