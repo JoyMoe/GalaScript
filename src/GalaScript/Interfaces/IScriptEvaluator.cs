@@ -3,11 +3,13 @@ using System.IO;
 
 namespace GalaScript.Interfaces
 {
-    public interface IScriptEvaluator : Interfaces.IEvaluator
+    public interface IScriptEvaluator : IEvaluator
     {
         long CurrentLineNumber { get; }
 
-        Interfaces.IEvaluator Current { get; }
+        long TotalLineNumber { get; }
+
+        IEvaluator Current { get; }
 
         Stack<object> Stack { get; }
 

@@ -65,6 +65,8 @@ namespace GalaScript.Evaluators
                 }
             }
 
+            TotalLineNumber = CurrentLineNumber;
+
             Reset();
         }
 
@@ -74,6 +76,8 @@ namespace GalaScript.Evaluators
         }
 
         public long CurrentLineNumber { get; protected set; }
+
+        public long TotalLineNumber { get; }
 
         public IEvaluator Current => _currentNode?.Value;
 
