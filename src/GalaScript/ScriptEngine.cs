@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using GalaScript.Exceptions;
 using GalaScript.Interfaces;
 using GalaScript.Internal;
 
@@ -192,6 +193,11 @@ namespace GalaScript
             if (caller == null)
             {
                 caller = _script;
+            }
+
+            if (!_functions.ContainsKey(name))
+            {
+                throw new MethodNotFoundException(name);
             }
 
             var result = _functions[name](this, caller, arguments);
