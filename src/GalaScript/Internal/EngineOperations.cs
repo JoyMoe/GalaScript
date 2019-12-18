@@ -4,6 +4,11 @@ namespace GalaScript.Internal
 {
     internal static class EngineOperations
     {
+        public static string Print(char op, string text)
+        {
+            return text;
+        }
+
         public static void Halt(IScriptEngine engine)
         {
             engine.Pause();
