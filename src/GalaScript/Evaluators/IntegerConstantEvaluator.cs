@@ -2,13 +2,13 @@
 
 namespace GalaScript.Evaluators
 {
-    public class ConstantEvaluator : IConstantEvaluator
+    public class IntegerConstantEvaluator : IConstantEvaluator
     {
-        private readonly string _k;
+        private readonly decimal _long;
 
-        public ConstantEvaluator(string k)
+        public IntegerConstantEvaluator(long @long)
         {
-            _k = k;
+            _long = @long;
         }
 
         public void SetCaller(IScriptEvaluator caller)
@@ -18,7 +18,7 @@ namespace GalaScript.Evaluators
 
         public object Evaluate()
         {
-            return _k;
+            return _long;
         }
     }
 }

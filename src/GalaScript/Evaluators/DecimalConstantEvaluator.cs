@@ -2,7 +2,7 @@
 
 namespace GalaScript.Evaluators
 {
-    public class DecimalConstantEvaluator : IEvaluator
+    public class DecimalConstantEvaluator : IConstantEvaluator
     {
         private readonly decimal _decimal;
 

@@ -2,13 +2,13 @@
 
 namespace GalaScript.Evaluators
 {
-    public class StringConstantEvaluator : IEvaluator
+    public class StringConstantEvaluator : IConstantEvaluator
     {
-        private readonly string _text;
+        private readonly string _string;
 
-        public StringConstantEvaluator(string text)
+        public StringConstantEvaluator(string @string)
         {
-            _text = text;
+            _string = @string;
         }
 
         public void SetCaller(IScriptEvaluator caller)
@@ -18,7 +18,7 @@ namespace GalaScript.Evaluators
 
         public object Evaluate()
         {
-            return _text;
+            return _string;
         }
     }
 }

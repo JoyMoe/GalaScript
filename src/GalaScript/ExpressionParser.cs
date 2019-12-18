@@ -35,7 +35,7 @@ namespace GalaScript
             from c in Parse.AnyChar
             select c;
 
-        private static readonly Parser<StringConstantEvaluator> QuotedString =
+        private static readonly Parser<IConstantEvaluator> QuotedString =
             from open in DoubleQuote
             from text in QuotedPair.Or(QdText).Many().Text()
             from close in DoubleQuote
@@ -47,12 +47,19 @@ namespace GalaScript
             from comment in Parse.CharExcept('\n').Many().Text()
             select comment;
 
-        private static readonly Parser<DecimalConstantEvaluator> Number =
+        private static readonly Parser<IConstantEvaluator> Integer =
+            from op in Parse.Char('-').Optional()
+            from num in Parse.Number
+            select new IntegerConstantEvaluator(long.Parse(num) * (op.IsDefined ? -1 : 1));
+
+        private static readonly Parser<IConstantEvaluator> Decimal =
             from op in Parse.Char('-').Optional()
             from num in Parse.Decimal
             select new DecimalConstantEvaluator(decimal.Parse(num) * (op.IsDefined ? -1 : 1));
 
-        private static readonly Parser<ConstantEvaluator> Constant =
+        private static readonly Parser<IConstantEvaluator> Number = Decimal.Or(Integer);
+
+        private static readonly Parser<IConstantEvaluator> Constant =
             from k in Token
             select new ConstantEvaluator(k);
 
