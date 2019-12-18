@@ -110,7 +110,7 @@ namespace GalaScript
                             Expression.Convert(Expression.Constant(info.DefaultValue), pType),
                             // ReSharper disable AssignNullToNotNullAttribute
                             Expression.Convert(Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex)), Expression.Constant(pType)), pType)
-                            // ReSharper restore AssignNullToNotNullAttribute
+                        // ReSharper restore AssignNullToNotNullAttribute
                         );
                         callExpr.Add(Expression.Convert(valueExpr, pType));
 
@@ -153,7 +153,7 @@ namespace GalaScript
 
                         callExpr.Add(convertCallExpr);
                     }
-                    else if(elementType == typeof(object))
+                    else if (elementType == typeof(object))
                     {
                         callExpr.Add(Expression.Call(toArrayMethod, Expression.Call(skipMethod, paraExpr, Expression.Constant(objIndex))));
                     }
@@ -169,7 +169,7 @@ namespace GalaScript
             bool isAction = func.Method.ReturnType == typeof(void);
 
             Func<IScriptEngine, IScriptEvaluator, object[], object> fun;
-            if(isAction)
+            if (isAction)
             {
                 var actionCaller = Expression.Lambda<Action<IScriptEngine, IScriptEvaluator, object[]>>(body, engineExpr, callerExpr, paraExpr).Compile();
                 fun = (engine, caller, obj) =>
@@ -181,14 +181,14 @@ namespace GalaScript
             else
             {
                 var boxed = Expression.Convert(body, typeof(object));
-                var funcCaller = Expression.Lambda<Func<IScriptEngine, IScriptEvaluator, object[], object>>(boxed, engineExpr,callerExpr, paraExpr).Compile();
+                var funcCaller = Expression.Lambda<Func<IScriptEngine, IScriptEvaluator, object[], object>>(boxed, engineExpr, callerExpr, paraExpr).Compile();
                 fun = (engine, caller, obj) => funcCaller(engine, caller, obj);
             }
 
             _functions[name] = fun;
         }
 
-        public object Call(IScriptEvaluator caller, string name , params object[] arguments)
+        public object Call(IScriptEvaluator caller, string name, params object[] arguments)
         {
             if (caller == null)
             {
