@@ -100,7 +100,7 @@ namespace GalaScript
             foreach (var info in funcParameters)
             {
                 var pType = info.ParameterType;
-                if (pType.IsValueType || pType == typeof(string))
+                if (pType.IsValueType || pType == typeof(string) || pType == typeof(object))
                 {
                     if (info.IsOptional && info.HasDefaultValue)
                     {
