@@ -69,12 +69,6 @@ namespace GalaScript
             from label in Token
             select new LabelEvaluator(label);
 
-        private static readonly Parser<IEvaluator> Text =
-            from op in Parse.Char('-').Or(Parse.Char('+'))
-            from space in Space.Optional()
-            from text in Parse.CharExcept('\n').AtLeastOnce().Text().Optional()
-            select new TextEvaluator(text.GetOrDefault(), op == '-');
-
         private static readonly Parser<IEnumerable<string>> MacroParameters =
             from lparen in Parse.Char('[')
             from parameters in Variable.DelimitedBy(Space)
@@ -90,6 +84,8 @@ namespace GalaScript
         private readonly Parser<IEvaluator> Function;
 
         private readonly Parser<IEvaluator> Alias;
+
+        private readonly Parser<IEvaluator> Text;
 
         private readonly Parser<IEvaluator> Macro;
 
@@ -132,6 +128,12 @@ namespace GalaScript
                 from trailing in Space.Optional()
                 from name in Variable
                 select new AliasEvaluator(_engine, name, func);
+
+            Text =
+                from op in Parse.Char('-').Or(Parse.Char('+'))
+                from space in Space.Optional()
+                from text in Parse.CharExcept('\n').AtLeastOnce().Text().Optional()
+                select new TextEvaluator(_engine, text.GetOrDefault(), op);
 
             Macro =
                 from op in Parse.Char('!')

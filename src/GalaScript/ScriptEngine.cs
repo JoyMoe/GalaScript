@@ -207,7 +207,7 @@ namespace GalaScript
                 return result;
             }
 
-            caller.SetAlias("ret", result);
+            caller?.SetAlias("ret", result);
 
             return result;
         }
