@@ -1,8 +1,6 @@
-﻿using GalaScript.Interfaces;
-
-namespace GalaScript.Evaluators
+﻿namespace GalaScript.Evaluators
 {
-    public class StringConstantEvaluator : IConstantEvaluator
+    public class StringConstantEvaluator : AbstractEvaluator
     {
         private readonly string _string;
 
@@ -11,14 +9,11 @@ namespace GalaScript.Evaluators
             _string = @string;
         }
 
-        public void SetCaller(IScriptEvaluator caller)
-        {
-            //
-        }
-
-        public object Evaluate()
+        public override object Evaluate()
         {
             return _string;
         }
+
+        public override string ToScriptString() => $"\"{_string}\"";
     }
 }

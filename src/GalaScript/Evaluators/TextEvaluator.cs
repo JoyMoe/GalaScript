@@ -2,10 +2,9 @@
 
 namespace GalaScript.Evaluators
 {
-    public class TextEvaluator : IEvaluator
+    public class TextEvaluator : AbstractEvaluator
     {
         private readonly IScriptEngine _engine;
-        private IScriptEvaluator _caller;
 
         private readonly string _text;
         private readonly char _op;
@@ -17,14 +16,11 @@ namespace GalaScript.Evaluators
             _op = op;
         }
 
-        public void SetCaller(IScriptEvaluator caller)
-        {
-            _caller = caller;
-        }
-
-        public object Evaluate()
+        public override object Evaluate()
         {
             return _engine.Call(_caller, "print", _op, _text);
         }
+
+        public override string ToScriptString() => $"{_op} {_text}";
     }
 }

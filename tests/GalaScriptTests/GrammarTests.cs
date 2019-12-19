@@ -40,10 +40,12 @@ namespace GalaScriptTests
             var foo = _parser.Prepare("* Label").FirstOrDefault();
             Assert.IsInstanceOf<LabelEvaluator>(foo);
             Assert.AreEqual("Label", foo.Evaluate());
+            Assert.AreEqual("* Label", foo.ToString());
 
             var bar = _parser.Prepare("* l_1").FirstOrDefault();
             Assert.IsInstanceOf<LabelEvaluator>(bar);
             Assert.AreEqual("l_1", bar.Evaluate());
+            Assert.AreEqual("* l_1", bar.ToString());
 
             Assert.Catch<ParseException>(() => _parser.Prepare("*"));
             Assert.Catch<ParseException>(() => _parser.Prepare("* "));
@@ -60,10 +62,12 @@ namespace GalaScriptTests
             var foo = _parser.Prepare("- Hello").FirstOrDefault();
             Assert.IsInstanceOf<TextEvaluator>(foo);
             Assert.AreEqual("Hello", foo.Evaluate());
+            Assert.AreEqual("- Hello", foo.ToString());
 
             var bar = _parser.Prepare("+ World").FirstOrDefault();
             Assert.IsInstanceOf<TextEvaluator>(bar);
             Assert.AreEqual("World", bar.Evaluate());
+            Assert.AreEqual("+ World", bar.ToString());
 
             var foobar = _parser.Prepare("- Hello World \\ \" + - * , . ; # [ ] /").FirstOrDefault();
             Assert.IsInstanceOf<TextEvaluator>(foobar);
@@ -79,9 +83,15 @@ namespace GalaScriptTests
         {
             var foo = _parser.Prepare("[add 2 0]").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(foo);
+            Assert.AreEqual("[add 2 0]", foo.ToString());
 
             var bar = _parser.Prepare("[split \"hello world\"]").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(bar);
+            Assert.AreEqual("[split \"hello world\"]", bar.ToString());
+
+            var nested = _parser.Prepare("[add 2 [add 2  4]]").FirstOrDefault();
+            Assert.IsInstanceOf<FunctionEvaluator>(nested);
+            Assert.AreEqual("[add 2 [add 2 4]]", nested.ToString());
 
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare("[ add 2 0 ]").FirstOrDefault());
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare(" [ add 2 0 ] ").FirstOrDefault());
@@ -94,8 +104,29 @@ namespace GalaScriptTests
         [Test]
         public void TestAlias()
         {
-            var exp = _parser.Prepare("[add 2 0] : $foo").FirstOrDefault();
-            Assert.IsInstanceOf<AliasEvaluator>(exp);
+            var foo = _parser.Prepare("[add 2 0] : $foo").FirstOrDefault();
+            Assert.IsInstanceOf<AliasEvaluator>(foo);
+            Assert.AreEqual("[add 2 0] : $foo", foo.ToString());
+
+            var number = _parser.Prepare(" 2.0 : $foo ").FirstOrDefault();
+            Assert.IsInstanceOf<AliasEvaluator>(number);
+            Assert.AreEqual("2.0 : $foo", number.ToString());
+
+            var @string = _parser.Prepare(" \"bar\" : $foo ").FirstOrDefault();
+            Assert.IsInstanceOf<AliasEvaluator>(@string);
+            Assert.AreEqual("\"bar\" : $foo", @string.ToString());
+
+            var ret = _parser.Prepare(" ret : $foo ").FirstOrDefault();
+            Assert.IsInstanceOf<AliasEvaluator>(ret);
+            Assert.AreEqual("ret : $foo", ret.ToString());
+
+            var alias = _parser.Prepare(" $bar : $foo ").FirstOrDefault();
+            Assert.IsInstanceOf<AliasEvaluator>(alias);
+            Assert.AreEqual("$bar : $foo", alias.ToString());
+
+            var @const = _parser.Prepare(" bar : $foo ").FirstOrDefault();
+            Assert.IsInstanceOf<AliasEvaluator>(@const);
+            Assert.AreEqual("bar : $foo", @const.ToString());
 
             Assert.IsInstanceOf<AliasEvaluator>(_parser.Prepare("[add 2 0]:$foo").FirstOrDefault());
             Assert.IsInstanceOf<AliasEvaluator>(_parser.Prepare("[ add 2 0 ]:$foo").FirstOrDefault());
@@ -131,12 +162,18 @@ namespace GalaScriptTests
 !").FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(foo);
+            Assert.AreEqual(@"!foo [$a $b $c]
+    [add $a $b $c]
+!", foo.ToString());
 
             var bar = _parser.Prepare(@"!bar
     [add 2 2 2]
 !").FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(bar);
+            Assert.AreEqual(@"!bar
+    [add 2 2 2]
+!", bar.ToString());
         }
 
         [Test]

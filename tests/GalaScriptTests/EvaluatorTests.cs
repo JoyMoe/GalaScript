@@ -22,13 +22,6 @@ namespace GalaScriptTests
         }
 
         [Test]
-        public void TestIntegerConstantEvaluator()
-        {
-            var e = new IntegerConstantEvaluator(100);
-            Assert.AreEqual(100, e.Evaluate());
-        }
-
-        [Test]
         public void TestDecimalConstantEvaluator()
         {
             var e = new DecimalConstantEvaluator(2.0m);

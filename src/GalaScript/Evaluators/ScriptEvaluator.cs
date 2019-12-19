@@ -7,7 +7,7 @@ using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
 {
-    public class ScriptEvaluator : IScriptEvaluator
+    public class ScriptEvaluator : AbstractEvaluator, IScriptEvaluator
     {
         protected readonly ScriptEngine Engine;
 
@@ -51,7 +51,7 @@ namespace GalaScript.Evaluators
                             return macro.Evaluate();
                         }
 
-                        Engine.Register(macro.Name, (Func<object[], object>) Macro);
+                        Engine.Register(macro.Name, (Func<object[], object>)Macro);
 
                         break;
                     case ScriptEvaluator sub:
@@ -68,11 +68,6 @@ namespace GalaScript.Evaluators
             TotalLineNumber = CurrentLineNumber;
 
             Reset();
-        }
-
-        public void SetCaller(IScriptEvaluator caller)
-        {
-            // TODO: Set caller for Script
         }
 
         public long CurrentLineNumber { get; protected set; }
@@ -150,7 +145,7 @@ namespace GalaScript.Evaluators
             return Return;
         }
 
-        public object Evaluate()
+        public override object Evaluate()
         {
             while (!Engine.IsCancellationRequested && _currentNode != null)
             {
@@ -219,6 +214,13 @@ namespace GalaScript.Evaluators
         public object Pop()
         {
             return _stack.Pop();
+        }
+
+        public override string ToScriptString()
+        {
+            var script = Script?.Select(s => s?.ToString());
+
+            return script == null ? "" : $"{string.Join("\n", script)}".TrimEnd();
         }
     }
 }

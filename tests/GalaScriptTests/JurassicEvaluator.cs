@@ -1,8 +1,8 @@
-﻿using GalaScript.Interfaces;
+﻿using GalaScript.Evaluators;
 
 namespace GalaScriptTests
 {
-    public class JurassicEvaluator : IEvaluator
+    public class JurassicEvaluator : AbstractEvaluator
     {
         private readonly string _js;
 
@@ -11,12 +11,7 @@ namespace GalaScriptTests
             _js = js;
         }
 
-        public void SetCaller(IScriptEvaluator caller)
-        {
-            //
-        }
-
-        public object Evaluate()
+        public override object Evaluate()
         {
             var engine = new Jurassic.ScriptEngine();
 
