@@ -1,5 +1,5 @@
 image: Visual Studio 2019
-version: '0.1.0-ci.{build}'
+version: "0.1.0-ci.{build}"
 init:
   - ps: |
       if ($env:APPVEYOR_REPO_TAG -eq "false")
@@ -12,8 +12,8 @@ skip_branch_with_pr: true
 dotnet_csproj:
   patch: true
   file: '**\*.csproj;**\*.props'
-  version: '{version}'
-  package_version: '{version}'
+  version: "{version}"
+  package_version: "{version}"
 install:
   - appveyor-retry dotnet restore -v Minimal
   - appveyor-retry choco install codecov
@@ -33,8 +33,6 @@ deploy:
     symbol_server: https://www.myget.org/F/galaengine/symbols/api/v2/package
     api_key:
       secure: 9EKvm3W60xQMcta7WZW0BISOOISgd1535xd3ie/D/uLcuFAjzDLBRzn2myEcd5xC
-    on:
-      branch: master
   - provider: NuGet
     name: NuGet
     api_key:
