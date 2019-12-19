@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
@@ -49,9 +47,6 @@ namespace GalaToaster
             _stackList = this.Get<ListBox>("StackList");
 
             _engine = new ScriptEngine(true);
-
-            decimal Add(decimal[] arguments) => arguments.Sum();
-            _engine.Register("add", (Func<decimal[], decimal>)Add);
 
             _engine.OnStartedHandler += () => Dispatcher.UIThread.InvokeAsync(() =>
             {

@@ -10,6 +10,16 @@ namespace GalaScriptTests
 {
     public class GrammarTests
     {
+        private const string MarcoFoo = @"!foo [$a $b $c]
+    [add $a $b]
+    [add ret $c]
+!";
+
+        private const string MarcoBar = @"!bar
+    [add 2 2]
+    [add ret 2]
+!";
+
         private readonly IParser _parser;
 
         public GrammarTests()
@@ -157,23 +167,15 @@ namespace GalaScriptTests
         [Test]
         public void TestMacro()
         {
-            var foo = _parser.Prepare(@"!foo [$a $b $c]
-    [add $a $b $c]
-!").FirstOrDefault();
+            var foo = _parser.Prepare(MarcoFoo).FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(foo);
-            Assert.AreEqual(@"!foo [$a $b $c]
-    [add $a $b $c]
-!", foo.ToString());
+            Assert.AreEqual(MarcoFoo, foo.ToString());
 
-            var bar = _parser.Prepare(@"!bar
-    [add 2 2 2]
-!").FirstOrDefault();
+            var bar = _parser.Prepare(MarcoBar).FirstOrDefault();
 
             Assert.IsInstanceOf<MacroEvaluator>(bar);
-            Assert.AreEqual(@"!bar
-    [add 2 2 2]
-!", bar.ToString());
+            Assert.AreEqual(MarcoBar, bar.ToString());
         }
 
         [Test]

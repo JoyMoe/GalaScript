@@ -10,20 +10,16 @@ namespace GalaScriptTests
     {
         private readonly IScriptEngine _engine;
 
-        private static decimal Add(params decimal[] arguments) =>
-            arguments.Aggregate(0.0m, (acc, argument) => acc + argument);
-
         private static string Echo(params string[] arguments) =>
             arguments.Aggregate("", (str, argument) => str + argument);
 
         public EngineTests()
         {
             _engine = new ScriptEngine(true);
-            _engine.Register("add", (Func<decimal[], decimal>)Add);
             _engine.Register("echo", (Func<string[], string>)Echo);
         }
 
-        [Test, Order(1)]
+        [Test]
         public void TestFunction()
         {
             Assert.AreEqual("hello", _engine.Run("[echo \"hello\"]"));
@@ -32,30 +28,45 @@ namespace GalaScriptTests
             Assert.AreEqual("hello world", _engine.Run("[echo \"hello world\"]"));
 
             Assert.AreEqual(2.0, _engine.Run("[add 2 0]"));
-            Assert.AreEqual(4.0, _engine.Run("[add 2 2]"));
             Assert.AreEqual(1.0, _engine.Run("[add 2 -1]"));
-            Assert.AreEqual(6.0, _engine.Run("[add 2 2 2]"));
+            Assert.AreEqual(4.0, _engine.Run("[mul 2 2]"));
+            Assert.AreEqual(1.0, _engine.Run("[div 2 2]"));
+
+            Assert.AreEqual(false, _engine.Run("[gt 2 2]"));
+            Assert.AreEqual(true, _engine.Run("[ge 2 2]"));
+            Assert.AreEqual(false, _engine.Run("[lt 2 2]"));
+            Assert.AreEqual(true, _engine.Run("[le 2 2]"));
+            Assert.AreEqual(true, _engine.Run("[eq 2 2]"));
+            Assert.AreEqual(false, _engine.Run("[ne 2 2]"));
+
+            Assert.AreEqual(-1, _engine.Run("[cmp 1 2]"));
+            Assert.AreEqual(0, _engine.Run("[cmp 2 2]"));
+            Assert.AreEqual(1, _engine.Run("[cmp 2 1]"));
         }
 
-        [Test, Order(2)]
+        [Test]
         public void TestReturn()
         {
-            Assert.AreEqual(8.0, _engine.Run("[add ret 2]"));
+            Assert.AreEqual(1.0, _engine.Run("[add 1 0]"));
+
+            Assert.AreEqual(3.0, _engine.Run("[add ret 2]"));
         }
 
-        [Test, Order(3)]
+        [Test]
         public void TestPushPeekPop()
         {
-            Assert.AreEqual(8.0, _engine.Run("[push]"));
+            Assert.AreEqual(1.0, _engine.Run("[add 1 0]"));
 
-            Assert.AreEqual(8.0, _engine.Run("[peek]"));
-            Assert.AreEqual(8.0, _engine.Run("[pop]"));
+            Assert.AreEqual(1.0, _engine.Run("[push]"));
+
+            Assert.AreEqual(1.0, _engine.Run("[peek]"));
+            Assert.AreEqual(1.0, _engine.Run("[pop]"));
 
             Assert.Catch<InvalidOperationException>(() => _engine.Run("[peek]"));
             Assert.Catch<InvalidOperationException>(() => _engine.Run("[pop]"));
         }
 
-        [Test, Order(5)]
+        [Test]
         public void TestAlias()
         {
             Assert.AreEqual(2.0, _engine.Run("[add 2 0] : $foo"));
@@ -63,7 +74,7 @@ namespace GalaScriptTests
             Assert.AreEqual(6.0, _engine.Run("[add $foo $bar]"));
         }
 
-        [Test, Order(6)]
+        [Test]
         public void TestPrepare()
         {
             _engine.Prepare("[add 2 2]");
@@ -71,7 +82,7 @@ namespace GalaScriptTests
             Assert.AreEqual(4.0, _engine.Run());
         }
 
-        [Test, Order(7)]
+        [Test]
         public void TestMacro()
         {
             _engine.Prepare(@"
@@ -98,7 +109,7 @@ namespace GalaScriptTests
             Assert.AreEqual(8.0, _engine.Run());
         }
 
-        [Test, Order(7)]
+        [Test]
         public void TestImport()
         {
             _engine.Prepare("misc/foo.gs");
@@ -106,7 +117,7 @@ namespace GalaScriptTests
             Assert.AreEqual(6.0, _engine.Run());
         }
 
-        [Test, Order(8)]
+        [Test]
         public void TestGotoGoif()
         {
             _engine.Prepare("misc/test.gs");

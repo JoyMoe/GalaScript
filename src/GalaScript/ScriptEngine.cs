@@ -69,8 +69,13 @@ namespace GalaScript
 
         private void PrepareOperations()
         {
-            foreach (var method in typeof(EngineOperations).GetMethods(BindingFlags.Static | BindingFlags.Public))
-                this.Register(method.Name.ToLower(), method);
+            foreach (var cls in typeof(InternalOperations).GetNestedTypes())
+            {
+                foreach (var method in cls.GetMethods(BindingFlags.Static | BindingFlags.Public))
+                {
+                    this.Register(method.Name.ToLower(), method);
+                }
+            }
         }
 
         public ScriptEngine(bool debug = false)
