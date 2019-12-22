@@ -11,7 +11,13 @@
 
         public override object Evaluate()
         {
-            return _k;
+            return _k switch
+            {
+                var _k when _k.ToLower() == "true" => true,
+                var _k when _k.ToLower() == "false" => false,
+                var _k when _k.ToLower() == "null" => null,
+                _ => _k,
+            };
         }
 
         public override string ToScriptString() => _k;
