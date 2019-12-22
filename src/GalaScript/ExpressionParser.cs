@@ -84,6 +84,8 @@ namespace GalaScript
 
         private readonly Parser<IEvaluator> Import;
 
+        private readonly Parser<IEvaluator> NamedParameter;
+
         private Parser<IEvaluator> Evaluator;
 
         // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
@@ -103,16 +105,21 @@ namespace GalaScript
                 from name in Parse.String("ret").Text()
                 select new AliasEvaluator(_engine, name);
 
+            NamedParameter =
+                from name in Token
+                from op in Parse.Char('=')
+                from value in Function.Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)
+                select new NamedParameterEvaluator(name, value);
+
             Function =
                 from lparen in Parse.Char('[')
                 from _ in Space.Optional()
                 from name in Token
                 from space in Space.Optional()
-                from expr in Parse.Ref(() => Function.Or(Label).Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant))
-                    .DelimitedBy(Space).Optional()
+                from expr in Parse.Ref(() => Label.Or(NamedParameter).Or(Function).Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)).DelimitedBy(Space).Optional()
                 from trailing in Space.Optional()
                 from rparen in Parse.Char(']')
-                select new FunctionEvaluator(_engine, name, expr.GetOrDefault()?.ToArray() ?? new IEvaluator[0]);
+                select new FunctionEvaluator(_engine, name, expr.GetOrDefault()?.ToArray() ?? Array.Empty<IEvaluator>());
 
             Alias =
                 from value in Function.Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)
