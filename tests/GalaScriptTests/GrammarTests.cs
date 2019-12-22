@@ -103,6 +103,14 @@ namespace GalaScriptTests
             Assert.IsInstanceOf<FunctionEvaluator>(nested);
             Assert.AreEqual("[add 2 [add 2 4]]", nested.ToString());
 
+            var named = _parser.Prepare("[hello 2 foo=4]").FirstOrDefault();
+            Assert.IsInstanceOf<FunctionEvaluator>(named);
+            Assert.AreEqual("[hello 2 foo=4]", named.ToString());
+
+            var namedWithSpace = _parser.Prepare("[hello 2 foo = 4]").FirstOrDefault();
+            Assert.IsInstanceOf<FunctionEvaluator>(namedWithSpace);
+            Assert.AreEqual("[hello 2 foo=4]", namedWithSpace.ToString());
+
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare("[ add 2 0 ]").FirstOrDefault());
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare(" [ add 2 0 ] ").FirstOrDefault());
 
