@@ -100,12 +100,21 @@ namespace GalaScript
             var engineExpr = Expression.Parameter(typeof(IScriptEngine), "engine");
             var callerExpr = Expression.Parameter(typeof(IScriptEvaluator), "caller");
             var paraExpr = Expression.Parameter(typeof(object[]), "obj");
-            //var optionsExpr = Expression.Parameter(typeof(Dictionary<string, object>), "options"); // TODO
+            var optionsExpr = Expression.Parameter(typeof(Dictionary<string, object>), "options");
             var callExpr = new List<Expression>(funcParameters.Length);
 
+            // paraLen = obj.Length
             var paraLenExpr = Expression.Property(paraExpr, "Length");
 
             var converter = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) });
+
+            static object GetValueOrThrow(Dictionary<string, object> dict, string key)
+            {
+                if (dict.ContainsKey(key))
+                    return dict[key];
+                throw new ArgumentException($"missing argument: {key}");
+            }
+            Func<Dictionary<string, object>, string, object> GetValueOrThrowFunc = GetValueOrThrow;
 
             int objIndex = 0;
             foreach (var info in funcParameters)
@@ -113,27 +122,15 @@ namespace GalaScript
                 var pType = info.ParameterType;
                 if (pType.IsValueType || pType == typeof(string) || pType == typeof(object))
                 {
-                    if (info.IsOptional && info.HasDefaultValue)
-                    {
-                        // value = objIndex > obj.Length ? info.DefaultValue : obj[objIndex]
-                        Expression valueExpr = Expression.Condition(
-                            Expression.GreaterThanOrEqual(Expression.Constant(objIndex), paraLenExpr),
-                            Expression.Convert(Expression.Constant(info.DefaultValue), pType),
-                            // ReSharper disable AssignNullToNotNullAttribute
-                            Expression.Convert(Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex)), Expression.Constant(pType)), pType)
-                        // ReSharper restore AssignNullToNotNullAttribute
+                    // value = i < paraLen ? obj[i] : ( options[key] ?? throw )
+                    Expression valueExpr = Expression.Condition(
+                        Expression.LessThan(Expression.Constant(objIndex), paraLenExpr),
+                        Expression.Convert(Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex)), Expression.Constant(pType)), pType),
+                        Expression.Convert(Expression.Call(GetValueOrThrowFunc.Method, optionsExpr, Expression.Constant(info.Name)), pType)
                         );
-                        callExpr.Add(Expression.Convert(valueExpr, pType));
+                    callExpr.Add(Expression.Convert(valueExpr, pType));
 
-                        objIndex++;
-                    }
-                    else
-                    {
-                        // ReSharper disable AssignNullToNotNullAttribute
-                        var convert = Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex++)), Expression.Constant(pType));
-                        // ReSharper restore AssignNullToNotNullAttribute
-                        callExpr.Add(Expression.Convert(convert, pType));
-                    }
+                    objIndex++;
                 }
                 else if (pType == typeof(IScriptEngine))
                 {
@@ -179,21 +176,42 @@ namespace GalaScript
 
             bool isAction = func.Method.ReturnType == typeof(void);
 
+            var defaultDict = funcParameters.Where(p => p.HasDefaultValue).ToDictionary(p => p.Name, p => p.DefaultValue);
+            void SplitArgs(object[] args, out object[] values, out Dictionary<string, object> dict)
+            {
+                var kvs = args.OfType<KeyValuePair<string, object>>().ToArray();
+                if (kvs.Length == 0)
+                {
+                    dict = defaultDict;
+                    values = args;
+                }
+                dict = new Dictionary<string, object>(defaultDict);
+                foreach (var kv in kvs)
+                    dict[kv.Key] = kv.Value;
+                values = args.Take(args.Length - kvs.Length).ToArray();
+            }
+
             Func<IScriptEngine, IScriptEvaluator, object[], object> fun;
             if (isAction)
             {
-                var actionCaller = Expression.Lambda<Action<IScriptEngine, IScriptEvaluator, object[]>>(body, engineExpr, callerExpr, paraExpr).Compile();
-                fun = (engine, caller, obj) =>
+                var actionCaller = Expression.Lambda<Action<IScriptEngine, IScriptEvaluator, object[], Dictionary<string, object>>>(body, engineExpr, callerExpr, paraExpr, optionsExpr).Compile();
+                fun = (engine, caller, args) =>
                 {
-                    actionCaller(engine, caller, obj);
+                    SplitArgs(args, out var values, out var dict);
+                    actionCaller(engine, caller, values, dict);
                     return Void;
                 };
             }
             else
             {
                 var boxed = Expression.Convert(body, typeof(object));
-                var funcCaller = Expression.Lambda<Func<IScriptEngine, IScriptEvaluator, object[], object>>(boxed, engineExpr, callerExpr, paraExpr).Compile();
-                fun = (engine, caller, obj) => funcCaller(engine, caller, obj);
+
+                var funcCaller = Expression.Lambda<Func<IScriptEngine, IScriptEvaluator, object[], Dictionary<string, object>, object>>(boxed, engineExpr, callerExpr, paraExpr, optionsExpr).Compile();
+                fun = (engine, caller, args) =>
+                {
+                    SplitArgs(args, out var values, out var dict);
+                    return funcCaller(engine, caller, values, dict);
+                };
             }
 
             _functions[name] = fun;
