@@ -11,11 +11,11 @@
 
         public override object Evaluate()
         {
-            return _k switch
+            return _k.ToLower() switch
             {
-                var _k when _k.ToLower() == "true" => true,
-                var _k when _k.ToLower() == "false" => false,
-                var _k when _k.ToLower() == "null" => null,
+                "true" => true,
+                "false" => false,
+                "null" => null,
                 _ => _k,
             };
         }
