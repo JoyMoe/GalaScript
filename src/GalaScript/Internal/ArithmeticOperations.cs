@@ -39,16 +39,6 @@
                 return x <= y;
             }
 
-            public static bool Eq(decimal x, decimal y)
-            {
-                return x == y;
-            }
-
-            public static bool Ne(decimal x, decimal y)
-            {
-                return x != y;
-            }
-
             public static int Cmp(decimal x, decimal y)
             {
                 return x switch
@@ -57,6 +47,16 @@
                     _ when x < y => -1,
                     _ => 0
                 };
+            }
+
+            public static bool Eq(object x, object y)
+            {
+                return x == y;
+            }
+
+            public static bool Ne(object x, object y)
+            {
+                return x != y;
             }
         }
     }
