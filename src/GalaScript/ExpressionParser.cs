@@ -107,7 +107,9 @@ namespace GalaScript
 
             NamedParameter =
                 from name in Token
+                from leading in Space.Optional()
                 from op in Parse.Char('=')
+                from trailing in Space.Optional()
                 from value in Function.Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)
                 select new NamedParameterEvaluator(name, value);
 
@@ -116,7 +118,7 @@ namespace GalaScript
                 from _ in Space.Optional()
                 from name in Token
                 from space in Space.Optional()
-                from expr in Parse.Ref(() => Label.Or(NamedParameter).Or(Function).Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)).DelimitedBy(Space).Optional()
+                from expr in Parse.Ref(() => NamedParameter.Or(Label).Or(Function).Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)).DelimitedBy(Space).Optional()
                 from trailing in Space.Optional()
                 from rparen in Parse.Char(']')
                 select new FunctionEvaluator(_engine, name, expr.GetOrDefault()?.ToArray() ?? Array.Empty<IEvaluator>());
