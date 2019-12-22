@@ -47,10 +47,27 @@ namespace GalaScript
             from comment in Parse.CharExcept('\n').Many().Text()
             select comment;
 
-        private static readonly Parser<IEvaluator> Number =
+        private static readonly Parser<IEvaluator> Decimal =
             from op in Parse.Char('-').Optional()
-            from num in Parse.Decimal
+            from n in Parse.Number.Optional()
+            from dot in Parse.Char('.')
+            from f in Parse.Number
+            from type in Parse.Char('m').Optional()
+            select new DecimalConstantEvaluator(decimal.Parse($"{n.GetOrElse("0")}.{f}") * (op.IsDefined ? -1 : 1));
+
+        private static readonly Parser<IEvaluator> DecimalWithType =
+            from op in Parse.Char('-').Optional()
+            from num in Parse.Number
+            from type in Parse.Char('m')
             select new DecimalConstantEvaluator(decimal.Parse(num) * (op.IsDefined ? -1 : 1));
+
+        private static readonly Parser<IEvaluator> Integer =
+            from op in Parse.Char('-').Optional()
+            from num in Parse.Number
+            from type in Parse.Char('L').Optional()
+            select new IntegerConstantEvaluator(long.Parse(num) * (op.IsDefined? -1 : 1));
+
+        private static readonly Parser<IEvaluator> Number = DecimalWithType.Or(Decimal).Or(Integer);
 
         private static readonly Parser<IEvaluator> Constant =
             from k in Token

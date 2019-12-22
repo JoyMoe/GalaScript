@@ -16,6 +16,6 @@ namespace GalaScript.Evaluators
             return _decimal;
         }
 
-        public override string ToScriptString() => _decimal.ToString(CultureInfo.InvariantCulture);
+        public override string ToScriptString() => $"{_decimal.ToString("0.0", CultureInfo.InvariantCulture)}m";
     }
 }

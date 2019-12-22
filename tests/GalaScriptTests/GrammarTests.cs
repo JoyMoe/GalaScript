@@ -16,8 +16,8 @@ namespace GalaScriptTests
 !";
 
         private const string MarcoBar = @"!bar
-    [add 2 2]
-    [add ret 2]
+    [add 2L 2.0m]
+    [add ret 2L]
 !";
 
         private readonly IParser _parser;
@@ -93,23 +93,23 @@ namespace GalaScriptTests
         {
             var foo = _parser.Prepare("[add 2 0]").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(foo);
-            Assert.AreEqual("[add 2 0]", foo.ToString());
+            Assert.AreEqual("[add 2L 0L]", foo.ToString());
 
             var bar = _parser.Prepare("[split \"hello world\"]").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(bar);
             Assert.AreEqual("[split \"hello world\"]", bar.ToString());
 
-            var nested = _parser.Prepare("[add 2 [add 2  4]]").FirstOrDefault();
+            var nested = _parser.Prepare("[add 2m [add 2  4]]").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(nested);
-            Assert.AreEqual("[add 2 [add 2 4]]", nested.ToString());
+            Assert.AreEqual("[add 2.0m [add 2L 4L]]", nested.ToString());
 
             var named = _parser.Prepare("[hello 2 foo=4]").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(named);
-            Assert.AreEqual("[hello 2 foo=4]", named.ToString());
+            Assert.AreEqual("[hello 2L foo=4L]", named.ToString());
 
             var namedWithSpace = _parser.Prepare("[hello 2 foo = 4]").FirstOrDefault();
             Assert.IsInstanceOf<FunctionEvaluator>(namedWithSpace);
-            Assert.AreEqual("[hello 2 foo=4]", namedWithSpace.ToString());
+            Assert.AreEqual("[hello 2L foo=4L]", namedWithSpace.ToString());
 
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare("[ add 2 0 ]").FirstOrDefault());
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare(" [ add 2 0 ] ").FirstOrDefault());
@@ -124,11 +124,11 @@ namespace GalaScriptTests
         {
             var foo = _parser.Prepare("[add 2 0] : $foo").FirstOrDefault();
             Assert.IsInstanceOf<AliasEvaluator>(foo);
-            Assert.AreEqual("[add 2 0] : $foo", foo.ToString());
+            Assert.AreEqual("[add 2L 0L] : $foo", foo.ToString());
 
             var number = _parser.Prepare(" 2.0 : $foo ").FirstOrDefault();
             Assert.IsInstanceOf<AliasEvaluator>(number);
-            Assert.AreEqual("2.0 : $foo", number.ToString());
+            Assert.AreEqual("2.0m : $foo", number.ToString());
 
             var @string = _parser.Prepare(" \"bar\" : $foo ").FirstOrDefault();
             Assert.IsInstanceOf<AliasEvaluator>(@string);
