@@ -54,8 +54,8 @@ namespace GalaScriptTests
 
             Assert.AreEqual(string.Empty, _engine.Run("[doubleString]"));
             Assert.AreEqual("abcabc", _engine.Run("[doubleString abc]"));
-            //Assert.AreEqual(string.Empty, _engine.Run("[doubleString key=abc]")); // todo: should throw error
-            //Assert.AreEqual("abcabc", _engine.Run("[doubleString str=abc]"));
+            Assert.AreEqual(string.Empty, _engine.Run("[doubleString key=abc]"));
+            Assert.AreEqual("abcabc", _engine.Run("[doubleString str=abc]"));
         }
 
         // for DefaultParameterTest2
@@ -70,9 +70,9 @@ namespace GalaScriptTests
             _engine.Register("msg", msgFunc);
 
             Assert.AreEqual("System/0:message", _engine.Run("[msg message]"));
-            //Assert.AreEqual("System/1:message", _engine.Run("[msg message channel=1]"));
-            //Assert.AreEqual("Default/0:message", _engine.Run("[msg message appname=Default]"));
-            //Assert.AreEqual("Default/2:mymsg", _engine.Run("[msg appname=Default channel=2 msg=mymsg]"));
+            Assert.AreEqual("System/1:message", _engine.Run("[msg message channel=1]"));
+            Assert.AreEqual("Default/0:message", _engine.Run("[msg message appname=Default]"));
+            Assert.AreEqual("Default/2:mymsg", _engine.Run("[msg appname=Default channel=2 msg=mymsg]"));
         }
     }
 }
