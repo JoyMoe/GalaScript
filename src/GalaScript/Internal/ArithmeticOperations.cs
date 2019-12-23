@@ -51,12 +51,12 @@
 
             public static bool Eq(object x, object y)
             {
-                return x == y;
+                return x.Equals(y);
             }
 
             public static bool Ne(object x, object y)
             {
-                return x != y;
+                return !Eq(x, y);
             }
         }
     }
