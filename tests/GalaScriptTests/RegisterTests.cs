@@ -25,7 +25,10 @@ namespace GalaScriptTests
             _engine.Register("throw", throwAction);
 
             Assert.AreEqual(3, _engine.Run("[add 1 2]"));
+
             Assert.Throws<Exception>(() => _engine.Run("[throw]"), "Throw!");
+
+            Assert.Throws<ArgumentException>(() => _engine.Run("[add]"), "Missing argument: a");
         }
 
         [Test]

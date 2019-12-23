@@ -106,7 +106,7 @@ namespace GalaScript
             {
                 if (dict.ContainsKey(key))
                     return dict[key];
-                throw new ArgumentException($"missing argument: {key}");
+                throw new ArgumentException($"Missing argument: {key}");
             }
 
             Func<Dictionary<string, object>, string, object> GetValueOrThrowFunc = GetValueOrThrow;
@@ -164,7 +164,7 @@ namespace GalaScript
                 }
                 else
                 {
-                    throw new ArgumentException("argument type must be value type or string", info.Name);
+                    throw new ArgumentException("Argument type must be value type or string", info.Name);
                 }
             }
 
