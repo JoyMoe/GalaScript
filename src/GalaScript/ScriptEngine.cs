@@ -126,7 +126,7 @@ namespace GalaScript
                     Expression valueExpr = Expression.Condition(
                         Expression.LessThan(Expression.Constant(objIndex), paraLenExpr),
                         Expression.Convert(Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex)), Expression.Constant(pType)), pType),
-                        Expression.Convert(Expression.Call(GetValueOrThrowFunc.Method, optionsExpr, Expression.Constant(info.Name)), pType)
+                        Expression.Convert(Expression.Call(converter, Expression.Call(GetValueOrThrowFunc.Method, optionsExpr, Expression.Constant(info.Name)), Expression.Constant(pType)), pType)
                         );
                     callExpr.Add(Expression.Convert(valueExpr, pType));
 
