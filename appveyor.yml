@@ -1,5 +1,5 @@
 image: Visual Studio 2019
-version: "0.1.0-ci.{build}"
+version: "0.2.0-ci.{build}"
 init:
   - ps: |
       if ($env:APPVEYOR_REPO_TAG -eq "false")
