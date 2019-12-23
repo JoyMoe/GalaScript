@@ -65,7 +65,7 @@ namespace GalaScript
             from op in Parse.Char('-').Optional()
             from num in Parse.Number
             from type in Parse.Char('L').Optional()
-            select new IntegerConstantEvaluator(long.Parse(num) * (op.IsDefined? -1 : 1));
+            select new IntegerConstantEvaluator(long.Parse(num) * (op.IsDefined ? -1 : 1));
 
         private static readonly Parser<IEvaluator> Number = DecimalWithType.Or(Decimal).Or(Integer);
 

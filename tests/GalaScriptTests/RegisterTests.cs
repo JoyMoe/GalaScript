@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace GalaScriptTests
 {
-    
+
     public class RegisterTests
     {
         private readonly IScriptEngine _engine;
@@ -47,7 +47,7 @@ namespace GalaScriptTests
         public void DefaultParameterTest()
         {
             Func<string, string> doubleStringFunc = DoubleString;
-            
+
             var ps = doubleStringFunc.Method.GetParameters();
 
             _engine.Register("doubleString", doubleStringFunc);
@@ -59,7 +59,7 @@ namespace GalaScriptTests
         }
 
         // for DefaultParameterTest2
-        string BuildMessage(string msg, string appname="System", int channel=0)
+        string BuildMessage(string msg, string appname = "System", int channel = 0)
             => $"{appname}/{channel}:{msg}";
 
         [Test]
