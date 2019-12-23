@@ -31,17 +31,9 @@ namespace GalaScriptTests
                 from op in Parse.String("@js").Token()
                 from str in Parse.AnyChar.Except(Parse.String("@js$")).AtLeastOnce().Text()
                 from ending in Parse.String("@js$")
-                select new JurassicEvaluator(str);
+                select new ConstantEvaluator(str);
 
             _parser.RegisterEvaluator(js);
-
-            var ts =
-                from op in Parse.String("@ts").Token()
-                from str in Parse.AnyChar.Except(Parse.String("@ts$")).AtLeastOnce().Text()
-                from ending in Parse.String("@ts$")
-                select new JurassicEvaluator(str);
-
-            _parser.RegisterEvaluator(ts);
         }
 
         [Test]
@@ -199,17 +191,8 @@ result = ""hello""
 @js$
 ").FirstOrDefault();
 
-            Assert.IsInstanceOf<JurassicEvaluator>(foo);
-            Assert.AreEqual("hello", foo.Evaluate());
-
-            var bar = _parser.Prepare(@"
-@ts
-result = ""hello""
-@ts$
-").FirstOrDefault();
-
-            Assert.IsInstanceOf<JurassicEvaluator>(bar);
-            Assert.AreEqual("hello", bar.Evaluate());
+            Assert.IsInstanceOf<ConstantEvaluator>(foo);
+            Assert.AreEqual("result = \"hello\"\n", foo.Evaluate());
         }
 
         [Test]
