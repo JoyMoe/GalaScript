@@ -25,9 +25,9 @@
                 _ => 0
             };
 
-            public static bool Eq(object x, object y) => x.Equals(y);
+            public static bool Eq(object x, object y) => x?.Equals(y) ?? y == null;
 
-            public static bool Ne(object x, object y) => !Eq(x, y);
+            public static bool Ne(object x, object y) => !x?.Equals(y) ?? y != null;
         }
     }
 }
