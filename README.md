@@ -14,7 +14,7 @@ The GalaScript script language
 
 ## Build
 
-Use Visual Studio 2017 (or higher), Xamarin Studio or MonoDevelop to build it.
+Use Visual Studio 2019 (or higher), Xamarin Studio or MonoDevelop to build it.
 
 You can also build it with [Mono C# Compiler](http://www.mono-project.com/docs/about-mono/languages/csharp) or [.NET Core](http://dotnet.github.io/).
 
