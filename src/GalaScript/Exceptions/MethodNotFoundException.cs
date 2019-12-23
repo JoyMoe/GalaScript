@@ -4,13 +4,13 @@ namespace GalaScript.Exceptions
 {
     public class MethodNotFoundException : Exception
     {
-        public string Method { get; set; }
+        private readonly string _method;
 
-        public override string Message => $"Method \"{Method}\" Not Found";
+        public override string Message => $"Method \"{_method}\" Not Found";
 
         public MethodNotFoundException(string method)
         {
-            Method = method;
+            _method = method;
         }
     }
 }
