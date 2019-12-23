@@ -13,8 +13,7 @@ namespace GalaScript.Evaluators
 
         private LinkedListNode<IEvaluator> _currentNode;
         protected readonly LinkedList<IEvaluator> Script = new LinkedList<IEvaluator>();
-        protected readonly Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>> Labels =
-            new Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>>();
+        protected readonly Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>> Labels = new Dictionary<string, KeyValuePair<long, LinkedListNode<IEvaluator>>>();
 
         private Stack<object> _stack = new Stack<object>();
         private Dictionary<string, object> _aliases = new Dictionary<string, object>();

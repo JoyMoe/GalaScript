@@ -100,7 +100,7 @@ namespace GalaScript
             // paraLen = obj.Length
             var paraLenExpr = Expression.Property(paraExpr, "Length");
 
-            var converter = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) });
+            var converter = typeof(Convert).GetMethod("ChangeType", new[] {typeof(object), typeof(Type)});
 
             static object GetValueOrThrow(Dictionary<string, object> dict, string key)
             {
@@ -108,6 +108,7 @@ namespace GalaScript
                     return dict[key];
                 throw new ArgumentException($"missing argument: {key}");
             }
+
             Func<Dictionary<string, object>, string, object> GetValueOrThrowFunc = GetValueOrThrow;
 
             int objIndex = 0;
@@ -121,7 +122,7 @@ namespace GalaScript
                         Expression.LessThan(Expression.Constant(objIndex), paraLenExpr),
                         Expression.Convert(Expression.Call(converter, Expression.ArrayIndex(paraExpr, Expression.Constant(objIndex)), Expression.Constant(pType)), pType),
                         Expression.Convert(Expression.Call(converter, Expression.Call(GetValueOrThrowFunc.Method, optionsExpr, Expression.Constant(info.Name)), Expression.Constant(pType)), pType)
-                        );
+                    );
                     callExpr.Add(Expression.Convert(valueExpr, pType));
 
                     objIndex++;
@@ -134,7 +135,8 @@ namespace GalaScript
                 {
                     callExpr.Add(callerExpr);
                 }
-                else if (Array.IndexOf(funcParameters, info) == funcParameters.Length - 1 && pType.BaseType == typeof(Array) && pType.GetElementType() is Type elementType)
+                else if (Array.IndexOf(funcParameters, info) == funcParameters.Length - 1 &&
+                         pType.BaseType == typeof(Array) && pType.GetElementType() is Type elementType)
                 {
                     // ReSharper disable PossibleNullReferenceException
                     var ofTypeMethod = typeof(Enumerable).GetMethod("OfType").MakeGenericMethod(elementType);
@@ -171,6 +173,7 @@ namespace GalaScript
             bool isAction = func.Method.ReturnType == typeof(void);
 
             var defaultDict = funcParameters.Where(p => p.HasDefaultValue).ToDictionary(p => p.Name, p => p.DefaultValue);
+
             void SplitArgs(object[] args, out object[] values, out Dictionary<string, object> dict)
             {
                 var kvs = args.OfType<KeyValuePair<string, object>>().ToArray();
@@ -179,6 +182,7 @@ namespace GalaScript
                     dict = defaultDict;
                     values = args;
                 }
+
                 dict = new Dictionary<string, object>(defaultDict);
                 foreach (var kv in kvs)
                     dict[kv.Key] = kv.Value;

@@ -6,7 +6,6 @@ using NUnit.Framework;
 
 namespace GalaScriptTests
 {
-
     public class RegisterTests
     {
         private readonly IScriptEngine _engine;
