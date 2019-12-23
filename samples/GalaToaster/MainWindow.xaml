@@ -8,12 +8,12 @@
         Title="MainWindow">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="52"/>
-            <RowDefinition/>
+            <RowDefinition Height="52" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <avalonEdit:TextEditor
             Name="ScriptBox"
@@ -23,9 +23,9 @@
             Foreground="White"
             ShowLineNumbers="True"
             HorizontalScrollBarVisibility="Auto"
-            VerticalScrollBarVisibility="Visible"/>
+            VerticalScrollBarVisibility="Visible" />
         <DockPanel Grid.Row="0" Grid.Column="1" Margin="10">
-            <TextBlock Name="Status" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Background="Red"/>
+            <TextBlock Name="Status" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Background="Red" />
             <Button Name="Build" ToolTip.Tip="Build &amp; Run" Width="30" VerticalAlignment="Stretch" Margin="0,0,0,0" Click="Build_Click">
                 <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" />
             </Button>
@@ -54,12 +54,12 @@
         <TabControl Grid.Column="1" Margin="10" Grid.Row="1">
             <TabItem Header="变量">
                 <Grid Background="#FFE5E5E5">
-                    <ListBox Name="AliasList"/>
+                    <ListBox Name="AliasList" />
                 </Grid>
             </TabItem>
             <TabItem Header="栈">
                 <Grid Background="#FFE5E5E5">
-                    <ListBox Name="StackList"/>
+                    <ListBox Name="StackList" />
                 </Grid>
             </TabItem>
         </TabControl>
