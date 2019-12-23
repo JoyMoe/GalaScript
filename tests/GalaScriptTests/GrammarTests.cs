@@ -49,13 +49,13 @@ namespace GalaScriptTests
             Assert.AreEqual("l_1", bar.Evaluate());
             Assert.AreEqual("* l_1", bar.ToString());
 
-            Assert.Catch<ParseException>(() => _parser.Prepare("*"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("* "));
-            Assert.Catch<ParseException>(() => _parser.Prepare("* 1"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("* _1"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("* -1"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("* l*1"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("* l-1"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("*"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("* "));
+            Assert.Throws<ParseException>(() => _parser.Prepare("* 1"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("* _1"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("* -1"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("* l*1"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("* l-1"));
         }
 
         [Test]
@@ -106,9 +106,9 @@ namespace GalaScriptTests
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare("[ add 2 0 ]").FirstOrDefault());
             Assert.IsInstanceOf<FunctionEvaluator>(_parser.Prepare(" [ add 2 0 ] ").FirstOrDefault());
 
-            Assert.Catch<ParseException>(() => _parser.Prepare("[add 2 0"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("[add"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("["));
+            Assert.Throws<ParseException>(() => _parser.Prepare("[add 2 0"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("[add"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("["));
         }
 
         [Test]
@@ -146,10 +146,10 @@ namespace GalaScriptTests
             Assert.IsInstanceOf<AliasEvaluator>(_parser.Prepare("[ add 2 0 ]:$foo").FirstOrDefault());
             Assert.IsInstanceOf<AliasEvaluator>(_parser.Prepare(" [ add 2 0 ] : $foo ").FirstOrDefault());
 
-            Assert.Catch<ParseException>(() => _parser.Prepare("[add 2 0 : $foo"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("[add : $foo"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("[ : $foo"));
-            Assert.Catch<ParseException>(() => _parser.Prepare("[add 2 0] : "));
+            Assert.Throws<ParseException>(() => _parser.Prepare("[add 2 0 : $foo"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("[add : $foo"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("[ : $foo"));
+            Assert.Throws<ParseException>(() => _parser.Prepare("[add 2 0] : "));
         }
 
         [Test]

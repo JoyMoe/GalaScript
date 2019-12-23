@@ -20,13 +20,13 @@ namespace GalaScriptTests
         public void BaseRegisterTest()
         {
             Func<int, int, int> addFunc = (a, b) => a + b;
-            Action throwAction = () => throw new Exception();
+            Action throwAction = () => throw new Exception("Throw!");
 
             _engine.Register("add", addFunc);
             _engine.Register("throw", throwAction);
 
             Assert.AreEqual(3, _engine.Run("[add 1 2]"));
-            Assert.Throws<Exception>(() => _engine.Run("[throw]"));
+            Assert.Throws<Exception>(() => _engine.Run("[throw]"), "Throw!");
         }
 
         [Test]
