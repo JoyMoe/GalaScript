@@ -1,8 +1,8 @@
-﻿using GalaScript.Interfaces;
+﻿using System.Globalization;
 
 namespace GalaScript.Evaluators
 {
-    public class DecimalConstantEvaluator : IEvaluator
+    public class DecimalConstantEvaluator : AbstractEvaluator
     {
         private readonly decimal _decimal;
 
@@ -11,14 +11,11 @@ namespace GalaScript.Evaluators
             _decimal = @decimal;
         }
 
-        public void SetCaller(IScriptEvaluator caller)
-        {
-            //
-        }
-
-        public object Evaluate()
+        public override object Evaluate()
         {
             return _decimal;
         }
+
+        public override string ToScriptString() => $"{_decimal.ToString("0.0", CultureInfo.InvariantCulture)}m";
     }
 }

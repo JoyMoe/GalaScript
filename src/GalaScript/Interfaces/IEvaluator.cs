@@ -5,5 +5,7 @@
         void SetCaller(IScriptEvaluator caller);
 
         object Evaluate();
+
+        string ToScriptString();
     }
 }

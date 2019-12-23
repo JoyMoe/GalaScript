@@ -2,10 +2,9 @@
 
 namespace GalaScript.Evaluators
 {
-    public class AliasEvaluator : IEvaluator
+    public class AliasEvaluator : AbstractEvaluator
     {
         private readonly IScriptEngine _engine;
-        private IScriptEvaluator _caller;
 
         private readonly string _name;
         private readonly IEvaluator _value;
@@ -17,14 +16,14 @@ namespace GalaScript.Evaluators
             _value = value;
         }
 
-        public void SetCaller(IScriptEvaluator caller)
+        public override void SetCaller(IScriptEvaluator caller)
         {
-            _caller = caller;
-
             _value?.SetCaller(caller);
+
+            base.SetCaller(caller);
         }
 
-        public object Evaluate()
+        public override object Evaluate()
         {
             if (_value == null)
             {
@@ -37,5 +36,7 @@ namespace GalaScript.Evaluators
 
             return result;
         }
+
+        public override string ToScriptString() => _value == null ? $"{_name}" : $"{_value} : {_name}";
     }
 }

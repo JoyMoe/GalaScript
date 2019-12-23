@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GalaScript.Interfaces;
 
 namespace GalaScript.Evaluators
@@ -49,5 +50,28 @@ namespace GalaScript.Evaluators
         }
 
         public string Name { get; }
+
+        public override string ToScriptString()
+        {
+            var @string = $"!{Name}";
+
+            var parameters = _parameters?.Select(p => p?.ToString());
+
+            if (parameters != null && parameters.Any())
+            {
+                @string += $" [{string.Join(" ", parameters)}]";
+            }
+
+            @string += "\n";
+
+            var script = Script?.Select(s => s?.ToString());
+
+            if (script != null)
+            {
+                @string += $"    {string.Join("\n    ", script)}";
+            }
+
+            return @string.TrimEnd() + "\n!";
+        }
     }
 }

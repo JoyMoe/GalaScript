@@ -35,7 +35,7 @@ namespace GalaScript
             from c in Parse.AnyChar
             select c;
 
-        private static readonly Parser<StringConstantEvaluator> QuotedString =
+        private static readonly Parser<IEvaluator> QuotedString =
             from open in DoubleQuote
             from text in QuotedPair.Or(QdText).Many().Text()
             from close in DoubleQuote
@@ -47,12 +47,29 @@ namespace GalaScript
             from comment in Parse.CharExcept('\n').Many().Text()
             select comment;
 
-        private static readonly Parser<DecimalConstantEvaluator> Number =
+        private static readonly Parser<IEvaluator> Decimal =
             from op in Parse.Char('-').Optional()
-            from num in Parse.Decimal
+            from n in Parse.Number.Optional()
+            from dot in Parse.Char('.')
+            from f in Parse.Number
+            from type in Parse.Char('m').Optional()
+            select new DecimalConstantEvaluator(decimal.Parse($"{n.GetOrElse("0")}.{f}") * (op.IsDefined ? -1 : 1));
+
+        private static readonly Parser<IEvaluator> DecimalWithType =
+            from op in Parse.Char('-').Optional()
+            from num in Parse.Number
+            from type in Parse.Char('m')
             select new DecimalConstantEvaluator(decimal.Parse(num) * (op.IsDefined ? -1 : 1));
 
-        private static readonly Parser<ConstantEvaluator> Constant =
+        private static readonly Parser<IEvaluator> Integer =
+            from op in Parse.Char('-').Optional()
+            from num in Parse.Number
+            from type in Parse.Char('L').Optional()
+            select new IntegerConstantEvaluator(long.Parse(num) * (op.IsDefined ? -1 : 1));
+
+        private static readonly Parser<IEvaluator> Number = DecimalWithType.Or(Decimal).Or(Integer);
+
+        private static readonly Parser<IEvaluator> Constant =
             from k in Token
             select new ConstantEvaluator(k);
 
@@ -61,12 +78,6 @@ namespace GalaScript
             from space in Space.Optional()
             from label in Token
             select new LabelEvaluator(label);
-
-        private static readonly Parser<IEvaluator> Text =
-            from op in Parse.Char('-').Or(Parse.Char('+'))
-            from space in Space.Optional()
-            from text in Parse.CharExcept('\n').AtLeastOnce().Text().Optional()
-            select new TextEvaluator(text.GetOrDefault(), op == '-');
 
         private static readonly Parser<IEnumerable<string>> MacroParameters =
             from lparen in Parse.Char('[')
@@ -84,9 +95,13 @@ namespace GalaScript
 
         private readonly Parser<IEvaluator> Alias;
 
+        private readonly Parser<IEvaluator> Text;
+
         private readonly Parser<IEvaluator> Macro;
 
         private readonly Parser<IEvaluator> Import;
+
+        private readonly Parser<IEvaluator> NamedParameter;
 
         private Parser<IEvaluator> Evaluator;
 
@@ -107,24 +122,37 @@ namespace GalaScript
                 from name in Parse.String("ret").Text()
                 select new AliasEvaluator(_engine, name);
 
+            NamedParameter =
+                from name in Token
+                from leading in Space.Optional()
+                from op in Parse.Char('=')
+                from trailing in Space.Optional()
+                from value in Function.Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)
+                select new NamedParameterEvaluator(name, value);
+
             Function =
                 from lparen in Parse.Char('[')
                 from _ in Space.Optional()
                 from name in Token
                 from space in Space.Optional()
-                from expr in Parse.Ref(() => Label.Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant))
-                    .DelimitedBy(Space).Optional()
+                from expr in Parse.Ref(() => NamedParameter.Or(Label).Or(Function).Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)).DelimitedBy(Space).Optional()
                 from trailing in Space.Optional()
                 from rparen in Parse.Char(']')
-                select new FunctionEvaluator(_engine, name, expr.GetOrDefault()?.ToArray() ?? new IEvaluator[0]);
+                select new FunctionEvaluator(_engine, name, expr.GetOrDefault()?.ToArray() ?? Array.Empty<IEvaluator>());
 
             Alias =
-                from func in Function
+                from value in Function.Or(Number).Or(QuotedString).Or(Ret).Or(Identifier).Or(Constant)
                 from leading in Space.Optional()
                 from op in Parse.Char(':')
                 from trailing in Space.Optional()
                 from name in Variable
-                select new AliasEvaluator(_engine, name, func);
+                select new AliasEvaluator(_engine, name, value);
+
+            Text =
+                from op in Parse.Char('-').Or(Parse.Char('+'))
+                from space in Space.Optional()
+                from text in Parse.CharExcept('\n').AtLeastOnce().Text().Optional()
+                select new TextEvaluator(_engine, text.GetOrDefault(), op);
 
             Macro =
                 from op in Parse.Char('!')

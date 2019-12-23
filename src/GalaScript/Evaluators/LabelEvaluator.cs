@@ -2,23 +2,20 @@
 
 namespace GalaScript.Evaluators
 {
-    public class LabelEvaluator : IEvaluator, INamedEvaluator
+    public class LabelEvaluator : AbstractEvaluator, INamedEvaluator
     {
         public LabelEvaluator(string label)
         {
             Name = label;
         }
 
-        public void SetCaller(IScriptEvaluator caller)
-        {
-            //
-        }
-
-        public object Evaluate()
+        public override object Evaluate()
         {
             return Name;
         }
 
         public string Name { get; }
+
+        public override string ToScriptString() => $"* {Name}";
     }
 }
