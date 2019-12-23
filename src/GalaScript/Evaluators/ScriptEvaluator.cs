@@ -58,8 +58,7 @@ namespace GalaScript.Evaluators
                         sub.ReplaceEnvironment(ref _stack, ref _aliases);
                         break;
                     case LabelEvaluator label:
-                        Labels[label.Name] =
-                            new KeyValuePair<long, LinkedListNode<IEvaluator>>(CurrentLineNumber, Script.Last);
+                        Labels[label.Name] = new KeyValuePair<long, LinkedListNode<IEvaluator>>(CurrentLineNumber, Script.Last);
                         break;
                 }
             }
@@ -122,9 +121,9 @@ namespace GalaScript.Evaluators
 
         public void Reset()
         {
-            if (Labels.ContainsKey("start"))
+            if (Labels.ContainsKey("* start"))
             {
-                Goto("start");
+                Goto("* start");
             }
             else
             {

@@ -41,12 +41,10 @@ namespace GalaScriptTests
         {
             var foo = _parser.Prepare("* Label").FirstOrDefault();
             Assert.IsInstanceOf<LabelEvaluator>(foo);
-            Assert.AreEqual("Label", foo.Evaluate());
             Assert.AreEqual("* Label", foo.ToString());
 
             var bar = _parser.Prepare("* l_1").FirstOrDefault();
             Assert.IsInstanceOf<LabelEvaluator>(bar);
-            Assert.AreEqual("l_1", bar.Evaluate());
             Assert.AreEqual("* l_1", bar.ToString());
 
             Assert.Throws<ParseException>(() => _parser.Prepare("*"));

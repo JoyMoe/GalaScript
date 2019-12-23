@@ -39,7 +39,7 @@ namespace GalaScriptTests
         public void TestLabelEvaluator()
         {
             var e = new LabelEvaluator("bar");
-            Assert.AreEqual("bar", e.Evaluate());
+            Assert.AreEqual("* bar", e.Evaluate());
         }
 
         [Test]

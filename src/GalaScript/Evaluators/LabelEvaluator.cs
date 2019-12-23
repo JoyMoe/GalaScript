@@ -6,7 +6,7 @@ namespace GalaScript.Evaluators
     {
         public LabelEvaluator(string label)
         {
-            Name = label;
+            Name = $"* {label}";
         }
 
         public override object Evaluate()
@@ -16,6 +16,6 @@ namespace GalaScript.Evaluators
 
         public string Name { get; }
 
-        public override string ToScriptString() => $"* {Name}";
+        public override string ToScriptString() => Name;
     }
 }

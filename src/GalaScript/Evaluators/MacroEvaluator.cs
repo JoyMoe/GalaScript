@@ -32,8 +32,7 @@ namespace GalaScript.Evaluators
                     case ScriptEvaluator _:
                         throw new NotSupportedException("Nested Macro is not supported.");
                     case LabelEvaluator label:
-                        Labels[label.Name] =
-                            new KeyValuePair<long, LinkedListNode<IEvaluator>>(CurrentLineNumber, Script.Last);
+                        Labels[label.Name] = new KeyValuePair<long, LinkedListNode<IEvaluator>>(CurrentLineNumber, Script.Last);
                         break;
                 }
             }
