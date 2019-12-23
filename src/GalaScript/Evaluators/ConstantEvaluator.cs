@@ -1,21 +1,32 @@
-﻿namespace GalaScript.Evaluators
+﻿using System.Collections.Generic;
+
+namespace GalaScript.Evaluators
 {
     public class ConstantEvaluator : AbstractEvaluator
     {
+        private readonly Dictionary<string, object> _constant = new Dictionary<string, object>
+        {
+            ["true"] = true,
+            ["false"] = false,
+            ["null"] = null,
+        };
+
         private readonly string _k;
 
         public ConstantEvaluator(string k)
         {
-            _k = k;
+            _k = k.ToLower() switch
+            {
+                var l when _constant.ContainsKey(l) => l,
+                _ => k,
+            };
         }
 
         public override object Evaluate()
         {
-            return _k.ToLower() switch
+            return _k switch
             {
-                "true" => true,
-                "false" => false,
-                "null" => null,
+                _ when _constant.TryGetValue(_k, out var c) => c,
                 _ => _k,
             };
         }

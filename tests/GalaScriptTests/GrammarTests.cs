@@ -142,9 +142,13 @@ namespace GalaScriptTests
             Assert.IsInstanceOf<AliasEvaluator>(alias);
             Assert.AreEqual("$bar : $foo", alias.ToString());
 
-            var @const = _parser.Prepare(" bar : $foo ").FirstOrDefault();
+            var @bool = _parser.Prepare(" True : $foo ").FirstOrDefault();
+            Assert.IsInstanceOf<AliasEvaluator>(@bool);
+            Assert.AreEqual("true : $foo", @bool.ToString());
+
+            var @const = _parser.Prepare(" HELLO : $foo ").FirstOrDefault();
             Assert.IsInstanceOf<AliasEvaluator>(@const);
-            Assert.AreEqual("bar : $foo", @const.ToString());
+            Assert.AreEqual("HELLO : $foo", @const.ToString());
 
             Assert.IsInstanceOf<AliasEvaluator>(_parser.Prepare("[add 2 0]:$foo").FirstOrDefault());
             Assert.IsInstanceOf<AliasEvaluator>(_parser.Prepare("[ add 2 0 ]:$foo").FirstOrDefault());
