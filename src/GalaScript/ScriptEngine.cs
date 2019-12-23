@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using GalaScript.Attributes;
 using GalaScript.Exceptions;
 using GalaScript.Interfaces;
 using GalaScript.Internal;
@@ -75,11 +74,6 @@ namespace GalaScript
                 foreach (var method in cls.GetMethods(BindingFlags.Static | BindingFlags.Public))
                 {
                     this.Register(method.Name.ToLower(), method);
-
-                    foreach (var alias in method.GetCustomAttributes<AliasAttribute>())
-                    {
-                        this.Register(alias.Name.ToLower(), method);
-                    }
                 }
             }
         }
